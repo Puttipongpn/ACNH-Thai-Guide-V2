@@ -43,7 +43,30 @@ Uploaded media files are stored by the backend and served from:
 http://localhost:8080/uploads/<file-name>
 ```
 
-Docker Compose persists uploads in the `backend_uploads` volume.
+Docker Compose persists uploads in the local `backend/uploads/` folder mounted into the backend container.
+
+## Import Facebook Candidates
+
+The Facebook group is private, so the importer never scrapes Facebook and never requires a Facebook login. It only reads the prepared local file:
+
+```text
+data/facebook-import-candidates.json
+```
+
+Start the database/backend stack first:
+
+```bash
+docker compose up -d postgres backend
+```
+
+Run the safe importer from the backend module:
+
+```bash
+cd backend
+DB_HOST=127.0.0.1 go run ./cmd/import-facebook
+```
+
+The command imports every candidate as a draft, skips duplicates by slug/source URL/source file metadata, copies local images into `backend/uploads/imported-facebook`, and creates media records when possible. Running it multiple times is safe and should not duplicate posts, content blocks, tags, categories, or media.
 
 ## Local Development
 

@@ -1,0 +1,201 @@
+{
+  "source_project": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group",
+  "target_project": "current workspace",
+  "assets_to_copy": [
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/public/content-images/curated-post-images",
+      "target_path": "frontend/public/content-images/curated-post-images",
+      "reason": "Best reusable visual asset set from v1: 27 guide/monthly folders, 307 public content images, already organized by guide slug and referenced with web-safe paths.",
+      "safe_to_copy": true
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/public/content-images/curated-post-images/monthly-guide-*",
+      "target_path": "frontend/public/content-images/curated-post-images/monthly-guide-*",
+      "reason": "Monthly guide image sets do not exist in v2 seed/import flow yet and would make public guide pages feel much richer after reviewed content import.",
+      "safe_to_copy": true
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/public/content-images/curated-post-images/{beginner-walkthrough-main,blue-rose-guide,meteonook-weather,celeste-guide,brewster-guide}",
+      "target_path": "frontend/public/content-images/curated-post-images/{same-folder-name}",
+      "reason": "High-value visual guides that directly match current Facebook import candidates and can be used as covers or content block images after review.",
+      "safe_to_copy": true
+    }
+  ],
+  "style_files_to_reference": [
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/index.css",
+      "reason": "Contains the strongest v1 visual language: fonts, palette tokens, soft card styles, hero background, article blocks, bottom nav, and tone classes.",
+      "migration_note": "Do not copy Tailwind classes into v2 directly. Translate values into MUI theme tokens and sx/shared components."
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/pages/HomePage.tsx",
+      "reason": "Home page has a more editorial Thai-first hero, search suggestions, stat chips, quick category cards, and note-style featured panel.",
+      "migration_note": "Recreate layout in v2 MUI using live backend data; do not reuse static data imports."
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/pages/DetailPage.tsx",
+      "reason": "Post detail page has better cover image treatment, tag/header hierarchy, source excerpt panel, related guides, additional image gallery, and source link panel.",
+      "migration_note": "Adapt to v2 Post + ContentBlock APIs and preserve current public rendering behavior."
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/Cards.tsx",
+      "reason": "Guide cards and category cards feel more like a community guidebook than v2 generic MUI cards.",
+      "migration_note": "Rebuild as MUI components using v2 Post/Category types."
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/Header.tsx",
+      "reason": "Sticky cream header with small island mark and compact nav is more cohesive than v2 route-level pages without shared public chrome.",
+      "migration_note": "Implement as a v2 PublicLayout using React Router links."
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/BottomNav.tsx",
+      "reason": "Mobile bottom navigation improves public page usability and gives the app a companion-like mobile feel.",
+      "migration_note": "Add only for public pages; keep admin navigation separate."
+    },
+    {
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/ArticleContent.tsx",
+      "reason": "Readable article block styling for paragraph, gallery, note, checklist, and closing blocks maps well to v2 content blocks.",
+      "migration_note": "Use as visual reference only; v2 block types are TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, HIGHLIGHT_BLOCK."
+    }
+  ],
+  "components_to_recreate": [
+    {
+      "name": "PublicLayout",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/Header.tsx and /Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/BottomNav.tsx",
+      "target_area": "frontend/src/layouts/PublicLayout.tsx",
+      "reason": "Give all public pages consistent header, footer, and mobile navigation without touching admin flows.",
+      "implementation_note": "Use MUI AppBar/Box or plain Box components with React Router NavLink; hide bottom nav on tablet/desktop."
+    },
+    {
+      "name": "CozyHero",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/pages/HomePage.tsx",
+      "target_area": "frontend/src/pages/App.tsx or frontend/src/components/CozyHero.tsx",
+      "reason": "v1 hero is Thai-first, guidebook-like, and has a charming note card using real post imagery.",
+      "implementation_note": "Use live categories/posts/health data from v2; keep API status less visually dominant than guide discovery."
+    },
+    {
+      "name": "SectionHeading",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/UI.tsx",
+      "target_area": "frontend/src/components/SectionHeading.tsx",
+      "reason": "Reusable eyebrow/title/description/action pattern improves public page rhythm.",
+      "implementation_note": "Implement with MUI Typography/Stack and theme typography variants."
+    },
+    {
+      "name": "CozyCategoryCard",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/Cards.tsx",
+      "target_area": "frontend/src/components/CategoryCard.tsx",
+      "reason": "v1 category cards use icons, count badges, tone colors, and softer density than current v2 category cards.",
+      "implementation_note": "Map existing v2 category slugs to icons/tone colors locally; do not require DB schema changes."
+    },
+    {
+      "name": "GuideCardWithImage",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/Cards.tsx",
+      "target_area": "frontend/src/components/PostCard.tsx",
+      "reason": "v1 guide cards include thumbnails and image count badges, making public browsing feel less abstract.",
+      "implementation_note": "Use first IMAGE_BLOCK/media URL when available; fallback to current text-only card."
+    },
+    {
+      "name": "CozySearchBar",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/SearchBar.tsx",
+      "target_area": "frontend/src/components/SearchBar.tsx",
+      "reason": "v1 search is friendlier and more prominent, especially with Thai placeholder text and suggestion chips.",
+      "implementation_note": "Rebuild with MUI TextField/InputAdornment and keep v2 search API."
+    },
+    {
+      "name": "ArticleDetailShell",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/pages/DetailPage.tsx and /Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/components/ArticleContent.tsx",
+      "target_area": "frontend/src/pages/PostDetailPage.tsx and frontend/src/components/ContentBlockRenderer.tsx",
+      "reason": "v1 post detail has better article paper, cover treatment, source excerpt, image gallery, notes, and related-link affordances.",
+      "implementation_note": "Translate visual style only; preserve v2 content block rendering and API loading/error states."
+    },
+    {
+      "name": "EmptyStateVisualTone",
+      "source_path": "/Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/pages/SearchPage.tsx and /Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group/src/index.css",
+      "target_area": "frontend/src/components/EmptyState.tsx",
+      "reason": "v1 empty states are softer and more local to the island notebook concept.",
+      "implementation_note": "Keep current reusable EmptyState API but adjust typography, icon, dashed border, and background."
+    }
+  ],
+  "theme_values": {
+    "colors": [
+      {
+        "name": "cream",
+        "value": "#fbf7ed",
+        "usage": "page background"
+      },
+      {
+        "name": "cream_deep",
+        "value": "#f1e5c9",
+        "usage": "soft panels and metadata chips"
+      },
+      {
+        "name": "ink",
+        "value": "#3e493e",
+        "usage": "primary text"
+      },
+      {
+        "name": "muted",
+        "value": "#687468",
+        "usage": "secondary text"
+      },
+      {
+        "name": "leaf",
+        "value": "#92bd91",
+        "usage": "primary accent"
+      },
+      {
+        "name": "leaf_deep",
+        "value": "#517b58",
+        "usage": "buttons and links"
+      },
+      {
+        "name": "leaf_pale",
+        "value": "#e2efde",
+        "usage": "green surfaces"
+      },
+      {
+        "name": "sky_pale",
+        "value": "#deeff0",
+        "usage": "blue section backgrounds"
+      },
+      {
+        "name": "peach_pale",
+        "value": "#fae7d5",
+        "usage": "warm category tone"
+      },
+      {
+        "name": "butter_pale",
+        "value": "#fbf0ca",
+        "usage": "notes and callouts"
+      },
+      {
+        "name": "rose_pale",
+        "value": "#f8e4de",
+        "usage": "alerts/highlights"
+      }
+    ],
+    "fonts": [
+      {
+        "family": "Noto Sans Thai",
+        "usage": "body/UI text"
+      },
+      {
+        "family": "Mali",
+        "usage": "display headings and cozy labels"
+      }
+    ],
+    "border_radius": "Prefer 16px for inputs/buttons, 24px for cards/article blocks, 28px for special note panels while preserving admin usability.",
+    "shadow_style": "Soft green/blue shadows such as 0 8px 20px rgba(83, 111, 87, 0.15) and 0 16px 34px rgba(127, 183, 126, 0.16).",
+    "background_style": "Cream base with pale leaf/sky/peach/butter bands and subtle radial accents; avoid strong full-page gradients as the main public identity."
+  },
+  "recommended_steps": [
+    "Add Google font imports for Mali and Noto Sans Thai to v2 index/global CSS or Vite HTML, then update MUI typography safely.",
+    "Translate v1 palette into frontend/src/theme/appTheme.ts and verify contrast on public and admin pages.",
+    "Create a PublicLayout for public pages only, inspired by v1 Header, footer, and BottomNav.",
+    "Rework Home page hero/search/category/latest post sections using v1 patterns but v2 live APIs.",
+    "Rework PostCard and Category cards to support tone colors, icons, thumbnails, and image count badges without DB changes.",
+    "Improve PostDetailPage and ContentBlockRenderer with v1 article paper, cover/media, notes, source panel, and gallery styling.",
+    "Copy only reviewed public content image folders into frontend/public/content-images or import selected images through v2 media upload flow.",
+    "Run frontend build and browser checks across home, category, search, post detail, login, and admin pages after each migration phase."
+  ]
+}

@@ -29,13 +29,13 @@ import {
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import CategoryIcon from '@mui/icons-material/Category';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import LogoutIcon from '@mui/icons-material/Logout';
-import SellIcon from '@mui/icons-material/Sell';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import { useNavigate } from 'react-router-dom';
+import AdminNav from '../components/AdminNav';
 import ContentBlockBuilder from '../components/ContentBlockBuilder';
+import { listContentBlocks } from '../services/contentBlockService';
 import { clearAuthToken, getAuthToken } from '../services/authService';
 import { listCategories } from '../services/categoryService';
 import { createPost, deletePost, listAdminPosts, updatePost } from '../services/postService';
@@ -58,6 +58,7 @@ export default function AdminPostsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [form, setForm] = useState<PostInput>(emptyForm);
+  const [contentCounts, setContentCounts] = useState<Record<string, number>>({});
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -92,6 +93,17 @@ export default function AdminPostsPage() {
       setPosts(postResponse.data);
       setCategories(categoryResponse.data);
       setTags(tagResponse.data);
+      const counts = await Promise.all(
+        postResponse.data.map(async (post) => {
+          try {
+            const response = await listContentBlocks(post.id);
+            return [post.id, response.data.length] as const;
+          } catch {
+            return [post.id, 0] as const;
+          }
+        }),
+      );
+      setContentCounts(Object.fromEntries(counts));
     } catch {
       setError('Unable to load posts. Please sign in again.');
     } finally {
@@ -143,8 +155,21 @@ export default function AdminPostsPage() {
         await updatePost(editingPost.id, form);
         setMessage('Post updated.');
       } else {
-        await createPost(form);
-        setMessage('Post created.');
+        const response = await createPost(form);
+        const createdPost = response.data;
+        setEditingPost(createdPost);
+        setForm({
+          title: createdPost.title,
+          slug: createdPost.slug,
+          description: createdPost.description,
+          source_url: createdPost.source_url,
+          status: createdPost.status,
+          category_id: createdPost.category_id,
+          tag_ids: createdPost.tags.map((tag) => tag.id),
+        });
+        setMessage('Post created. Continue with Step 2: add content blocks.');
+        await refreshData();
+        return;
       }
 
       closeModal();
@@ -211,17 +236,9 @@ export default function AdminPostsPage() {
             </Box>
 
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Button component={RouterLink} to="/admin/categories" variant="outlined" startIcon={<CategoryIcon />}>
-                Categories
-              </Button>
-              <Button component={RouterLink} to="/admin/tags" variant="outlined" startIcon={<SellIcon />}>
-                Tags
-              </Button>
-              <Button variant="outlined" startIcon={<LogoutIcon />} onClick={handleLogout}>
-                Logout
-              </Button>
+              <AdminNav onLogout={handleLogout} />
               <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateModal}>
-                New
+                Create Post
               </Button>
             </Stack>
           </Stack>
@@ -244,6 +261,7 @@ export default function AdminPostsPage() {
                   <TableCell>Title</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Category</TableCell>
+                  <TableCell>Content</TableCell>
                   <TableCell>Tags</TableCell>
                   <TableCell>Source</TableCell>
                   <TableCell align="right">Actions</TableCell>
@@ -252,12 +270,12 @@ export default function AdminPostsPage() {
               <TableBody>
                 {loading && (
                   <TableRow>
-                    <TableCell colSpan={6}>Loading posts...</TableCell>
+                    <TableCell colSpan={7}>Loading posts...</TableCell>
                   </TableRow>
                 )}
                 {!loading && posts.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6}>No posts yet.</TableCell>
+                    <TableCell colSpan={7}>No posts yet.</TableCell>
                   </TableRow>
                 )}
                 {posts.map((post) => (
@@ -270,12 +288,23 @@ export default function AdminPostsPage() {
                       <Chip label={post.status} size="small" color={post.status === 'published' ? 'primary' : 'default'} />
                     </TableCell>
                     <TableCell>{post.category?.name ?? '-'}</TableCell>
+                    <TableCell>
+                      <Chip
+                        icon={<AutoStoriesIcon />}
+                        label={`${contentCounts[post.id] ?? 0} blocks`}
+                        size="small"
+                        color={(contentCounts[post.id] ?? 0) > 0 ? 'primary' : 'default'}
+                      />
+                    </TableCell>
                     <TableCell>{post.tags.length > 0 ? post.tags.map((tag) => tag.name).join(', ') : '-'}</TableCell>
                     <TableCell>{post.source_url || '-'}</TableCell>
                     <TableCell align="right">
                       <IconButton aria-label={`Edit ${post.title}`} onClick={() => openEditModal(post)}>
                         <EditIcon />
                       </IconButton>
+                      <Button size="small" variant="outlined" onClick={() => openEditModal(post)}>
+                        Edit Content
+                      </Button>
                       <IconButton aria-label={`Delete ${post.title}`} onClick={() => void handleDelete(post)}>
                         <DeleteIcon />
                       </IconButton>
@@ -312,6 +341,11 @@ export default function AdminPostsPage() {
                   </Stack>
                   <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                     <Chip label={post.category?.name ?? 'No category'} size="small" variant="outlined" />
+                    <Chip
+                      label={`${contentCounts[post.id] ?? 0} content blocks`}
+                      size="small"
+                      color={(contentCounts[post.id] ?? 0) > 0 ? 'primary' : 'default'}
+                    />
                     {post.tags.map((tag) => (
                       <Chip key={tag.id} label={tag.name} size="small" variant="outlined" />
                     ))}
@@ -320,9 +354,9 @@ export default function AdminPostsPage() {
                     {post.source_url || 'No source URL'}
                   </Typography>
                   <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <IconButton aria-label={`Edit ${post.title}`} onClick={() => openEditModal(post)}>
-                      <EditIcon />
-                    </IconButton>
+                    <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => openEditModal(post)}>
+                      Edit / Content
+                    </Button>
                     <IconButton aria-label={`Delete ${post.title}`} onClick={() => void handleDelete(post)}>
                       <DeleteIcon />
                     </IconButton>
@@ -339,96 +373,134 @@ export default function AdminPostsPage() {
           <DialogTitle>{modalTitle}</DialogTitle>
           <DialogContent sx={{ px: { xs: 2, md: 3 } }}>
             <Stack spacing={2} sx={{ pt: 1 }}>
-              <TextField
-                label="Title"
-                value={form.title}
-                onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-                required
-                fullWidth
-              />
-              <TextField
-                label="Slug"
-                value={form.slug}
-                onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-                required
-                fullWidth
-              />
-              <TextField
-                label="Description"
-                value={form.description}
-                onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-                multiline
-                minRows={3}
-                fullWidth
-              />
-              <TextField
-                label="Facebook source URL"
-                value={form.source_url}
-                onChange={(event) => setForm((current) => ({ ...current, source_url: event.target.value }))}
-                fullWidth
-              />
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                <FormControl fullWidth required>
-                  <InputLabel id="post-category-label">Category</InputLabel>
-                  <Select
-                    labelId="post-category-label"
-                    label="Category"
-                    value={form.category_id}
-                    onChange={(event) => setForm((current) => ({ ...current, category_id: event.target.value }))}
-                  >
-                    {categories.map((category) => (
-                      <MenuItem key={category.id} value={category.id}>
-                        {category.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+              <Paper elevation={0} sx={{ p: 2, border: '1px solid rgba(111, 102, 85, 0.14)', borderRadius: 2 }}>
+                <Stack spacing={2}>
+                  <Box>
+                    <Typography sx={{ fontWeight: 800 }}>Step 1: Post info</Typography>
+                    <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+                      Add the searchable title, slug, category, status, tags, and Facebook source.
+                    </Typography>
+                  </Box>
+                  <TextField
+                    label="Title"
+                    helperText="Required. Use a clear guide title."
+                    value={form.title}
+                    onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                    required
+                    fullWidth
+                  />
+                  <TextField
+                    label="Slug"
+                    helperText="Required and unique. Example: beginner-guide."
+                    value={form.slug}
+                    onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
+                    required
+                    fullWidth
+                  />
+                  <TextField
+                    label="Description"
+                    helperText="Short summary shown on public cards and search results."
+                    value={form.description}
+                    onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                    multiline
+                    minRows={3}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Facebook source URL"
+                    helperText="Optional, but recommended for attribution."
+                    value={form.source_url}
+                    onChange={(event) => setForm((current) => ({ ...current, source_url: event.target.value }))}
+                    fullWidth
+                  />
+                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                    <FormControl fullWidth required>
+                      <InputLabel id="post-category-label">Category</InputLabel>
+                      <Select
+                        labelId="post-category-label"
+                        label="Category"
+                        value={form.category_id}
+                        onChange={(event) => setForm((current) => ({ ...current, category_id: event.target.value }))}
+                      >
+                        {categories.map((category) => (
+                          <MenuItem key={category.id} value={category.id}>
+                            {category.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
-                <FormControl fullWidth required>
-                  <InputLabel id="post-status-label">Status</InputLabel>
-                  <Select
-                    labelId="post-status-label"
-                    label="Status"
-                    value={form.status}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        status: event.target.value as PostStatus,
-                      }))
-                    }
-                  >
-                    <MenuItem value="draft">Draft</MenuItem>
-                    <MenuItem value="published">Published</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
+                    <FormControl fullWidth required>
+                      <InputLabel id="post-status-label">Status</InputLabel>
+                      <Select
+                        labelId="post-status-label"
+                        label="Status"
+                        value={form.status}
+                        onChange={(event) =>
+                          setForm((current) => ({
+                            ...current,
+                            status: event.target.value as PostStatus,
+                          }))
+                        }
+                      >
+                        <MenuItem value="draft">Draft</MenuItem>
+                        <MenuItem value="published">Published</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Stack>
 
-              <FormControl fullWidth>
-                <InputLabel id="post-tags-label">Tags</InputLabel>
-                <Select
-                  labelId="post-tags-label"
-                  multiple
-                  value={form.tag_ids}
-                  input={<OutlinedInput label="Tags" />}
-                  renderValue={(selected) => tagNames(selected)}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setForm((current) => ({
-                      ...current,
-                      tag_ids: typeof value === 'string' ? value.split(',') : value,
-                    }));
-                  }}
-                >
-                  {tags.map((tag) => (
-                    <MenuItem key={tag.id} value={tag.id}>
-                      <Checkbox checked={form.tag_ids.includes(tag.id)} />
-                      <ListItemText primary={tag.name} secondary={tag.slug} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  <FormControl fullWidth>
+                    <InputLabel id="post-tags-label">Tags</InputLabel>
+                    <Select
+                      labelId="post-tags-label"
+                      multiple
+                      value={form.tag_ids}
+                      input={<OutlinedInput label="Tags" />}
+                      renderValue={(selected) => tagNames(selected)}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setForm((current) => ({
+                          ...current,
+                          tag_ids: typeof value === 'string' ? value.split(',') : value,
+                        }));
+                      }}
+                    >
+                      {tags.map((tag) => (
+                        <MenuItem key={tag.id} value={tag.id}>
+                          <Checkbox checked={form.tag_ids.includes(tag.id)} />
+                          <ListItemText primary={tag.name} secondary={tag.slug} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
+              </Paper>
 
-              {editingPost && <ContentBlockBuilder postId={editingPost.id} />}
+              {editingPost ? (
+                <>
+                  <Paper elevation={0} sx={{ p: 2, border: '1px solid rgba(111, 102, 85, 0.14)', borderRadius: 2 }}>
+                    <Typography sx={{ fontWeight: 800 }}>Step 2: Content blocks</Typography>
+                    <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+                      Add text, highlights, images, and videos. Reorder blocks to control the public post detail page.
+                    </Typography>
+                  </Paper>
+                  <ContentBlockBuilder postId={editingPost.id} />
+                </>
+              ) : (
+                <Paper elevation={0} sx={{ p: 2, border: '1px dashed rgba(111, 102, 85, 0.22)', borderRadius: 2 }}>
+                  <Typography sx={{ fontWeight: 800 }}>Step 2: Content blocks</Typography>
+                  <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+                    Save the post first. After creation, this dialog will stay open so you can add content blocks immediately.
+                  </Typography>
+                </Paper>
+              )}
+
+              <Paper elevation={0} sx={{ p: 2, border: '1px solid rgba(111, 102, 85, 0.14)', borderRadius: 2, bgcolor: '#fff8e8' }}>
+                <Typography sx={{ fontWeight: 800 }}>Step 3: Images / Video</Typography>
+                <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+                  Use Image or Video blocks to upload new media, choose from the media library, or paste an external URL.
+                </Typography>
+              </Paper>
             </Stack>
           </DialogContent>
           <DialogActions sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>

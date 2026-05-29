@@ -24,10 +24,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import LogoutIcon from '@mui/icons-material/Logout';
-import ArticleIcon from '@mui/icons-material/Article';
-import SellIcon from '@mui/icons-material/Sell';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import AdminNav from '../components/AdminNav';
 import { clearAuthToken, getAuthToken } from '../services/authService';
 import {
   createCategory,
@@ -182,20 +180,9 @@ export default function AdminCategoriesPage() {
             </Box>
 
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Button component={RouterLink} to="/" variant="outlined">
-                Home
-              </Button>
-              <Button component={RouterLink} to="/admin/posts" variant="outlined" startIcon={<ArticleIcon />}>
-                Posts
-              </Button>
-              <Button component={RouterLink} to="/admin/tags" variant="outlined" startIcon={<SellIcon />}>
-                Tags
-              </Button>
-              <Button variant="outlined" startIcon={<LogoutIcon />} onClick={handleLogout}>
-                Logout
-              </Button>
+              <AdminNav onLogout={handleLogout} />
               <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateModal}>
-                New
+                Create Category
               </Button>
             </Stack>
           </Stack>

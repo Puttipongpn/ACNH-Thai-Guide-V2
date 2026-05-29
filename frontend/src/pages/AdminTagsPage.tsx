@@ -22,12 +22,10 @@ import {
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import ArticleIcon from '@mui/icons-material/Article';
-import CategoryIcon from '@mui/icons-material/Category';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import AdminNav from '../components/AdminNav';
 import { clearAuthToken, getAuthToken } from '../services/authService';
 import { createTag, deleteTag, listTags, updateTag } from '../services/tagService';
 import type { Tag, TagInput } from '../types/api';
@@ -175,17 +173,9 @@ export default function AdminTagsPage() {
             </Box>
 
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Button component={RouterLink} to="/admin/categories" variant="outlined" startIcon={<CategoryIcon />}>
-                Categories
-              </Button>
-              <Button component={RouterLink} to="/admin/posts" variant="outlined" startIcon={<ArticleIcon />}>
-                Posts
-              </Button>
-              <Button variant="outlined" startIcon={<LogoutIcon />} onClick={handleLogout}>
-                Logout
-              </Button>
+              <AdminNav onLogout={handleLogout} />
               <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateModal}>
-                New
+                Create Tag
               </Button>
             </Stack>
           </Stack>

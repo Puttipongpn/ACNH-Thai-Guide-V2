@@ -16,7 +16,9 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import ContentBlockRenderer from '../components/ContentBlockRenderer';
 import { listContentBlocks } from '../services/contentBlockService';
 import { getPost } from '../services/postService';
+import { publicPalette } from '../theme/appTheme';
 import type { ContentBlock, Post } from '../types/api';
+import { getCategoryIcon, softBorder, softShadow } from '../utils/publicStyle';
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -24,6 +26,7 @@ export default function PostDetailPage() {
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const firstImageBlock = blocks.find((block) => block.type === 'IMAGE_BLOCK' && block.metadata.image_url);
 
   useEffect(() => {
     let active = true;
@@ -58,15 +61,13 @@ export default function PostDetailPage() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(180deg, #fff8e8 0%, #e5f4dc 58%, #d8eef7 100%)',
         py: { xs: 3, md: 6 },
       }}
     >
       <Container maxWidth="md">
         <Stack spacing={3}>
           <Button component={RouterLink} to="/" variant="outlined" startIcon={<ArrowBackIcon />} sx={{ alignSelf: 'flex-start' }}>
-            Home
+            หน้าแรก
           </Button>
 
           {loading && <Alert severity="info">Loading guide...</Alert>}
@@ -77,22 +78,53 @@ export default function PostDetailPage() {
               <Paper
                 elevation={0}
                 sx={{
-                  p: { xs: 3, md: 4 },
-                  border: '1px solid rgba(111, 102, 85, 0.14)',
-                  boxShadow: '0 18px 42px rgba(127, 183, 126, 0.18)',
+                  p: { xs: 2.5, md: 3.5 },
+                  border: softBorder,
+                  boxShadow: softShadow,
+                  bgcolor: 'rgba(255, 253, 244, 0.82)',
+                  borderRadius: 7,
+                  overflow: 'hidden',
                 }}
               >
+                {firstImageBlock?.metadata.image_url && (
+                  <Box
+                    component="figure"
+                    sx={{
+                      m: { xs: -1, md: -1.5 },
+                      mb: { xs: 3, md: 4 },
+                      overflow: 'hidden',
+                      borderRadius: 5,
+                      bgcolor: publicPalette.creamDeep,
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={firstImageBlock.metadata.image_url}
+                      alt={firstImageBlock.metadata.alt_text ?? post.title}
+                      sx={{
+                        display: 'block',
+                        width: '100%',
+                        maxHeight: 470,
+                        objectFit: 'cover',
+                      }}
+                    />
+                    {firstImageBlock.metadata.caption && (
+                      <Typography component="figcaption" sx={{ px: 2, py: 1.5, color: 'text.secondary', fontSize: 13 }}>
+                        {firstImageBlock.metadata.caption}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
                 <Stack spacing={2}>
                   <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    <Chip label={post.category?.name ?? 'Guide'} color="primary" />
-                    <Chip label={post.status} variant="outlined" />
+                    <Chip label={`${getCategoryIcon(post.category)} ${post.category?.name ?? 'Guide'}`} color="primary" />
                     {post.tags.map((tag) => (
-                      <Chip key={tag.id} label={tag.name} variant="outlined" />
+                      <Chip key={tag.id} label={tag.name} sx={{ bgcolor: publicPalette.leafPale }} />
                     ))}
                   </Stack>
                   <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
-                    Created {new Date(post.created_at).toLocaleDateString()} · Updated{' '}
-                    {new Date(post.updated_at).toLocaleDateString()}
+                    สร้าง {new Date(post.created_at).toLocaleDateString('th-TH')} · อัปเดต{' '}
+                    {new Date(post.updated_at).toLocaleDateString('th-TH')}
                   </Typography>
                   <Typography variant="h1" sx={{ fontSize: { xs: 34, md: 48 } }}>
                     {post.title}
@@ -101,11 +133,6 @@ export default function PostDetailPage() {
                     <Typography sx={{ color: 'text.secondary', fontSize: 18, lineHeight: 1.8 }}>
                       {post.description}
                     </Typography>
-                  )}
-                  {post.source_url && (
-                    <Link href={post.source_url} target="_blank" rel="noreferrer" sx={{ display: 'inline-flex', gap: 0.75, alignItems: 'center' }}>
-                      Source <OpenInNewIcon fontSize="small" />
-                    </Link>
                   )}
                 </Stack>
               </Paper>
@@ -116,8 +143,9 @@ export default function PostDetailPage() {
                     elevation={0}
                     sx={{
                       p: 3,
-                      border: '1px solid rgba(111, 102, 85, 0.14)',
-                      bgcolor: '#fffdf4',
+                      border: softBorder,
+                      bgcolor: publicPalette.paper,
+                      borderRadius: 5,
                     }}
                   >
                     <Typography sx={{ color: 'text.secondary' }}>This guide does not have content blocks yet.</Typography>
@@ -128,16 +156,46 @@ export default function PostDetailPage() {
                     key={block.id}
                     elevation={0}
                     sx={{
-                      p: { xs: 2.5, md: 3 },
-                      border: '1px solid rgba(111, 102, 85, 0.12)',
-                      bgcolor: '#fffdf4',
-                      boxShadow: '0 12px 30px rgba(154, 197, 216, 0.16)',
+                      p: { xs: 2.5, md: 3.5 },
+                      border: softBorder,
+                      bgcolor: 'rgba(255, 253, 244, 0.82)',
+                      boxShadow: '0 10px 24px rgba(83, 111, 87, 0.08)',
+                      borderRadius: 5,
                     }}
                   >
                     <ContentBlockRenderer block={block} />
                   </Paper>
                 ))}
               </Stack>
+
+              {post.source_url && (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 2.5, md: 3 },
+                    border: '1px dashed rgba(146, 189, 145, 0.36)',
+                    bgcolor: 'rgba(255, 253, 244, 0.62)',
+                    borderRadius: 5,
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Typography variant="h6" sx={{ fontSize: 20 }}>
+                      ลิงก์ต้นทาง
+                    </Typography>
+                    <Typography sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
+                      เปิดโพสต์ Facebook เพื่ออ่านต้นฉบับ คอมเมนต์ และรายละเอียดเพิ่มเติมจากเจ้าของโพสต์
+                    </Typography>
+                    <Link
+                      href={post.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      sx={{ display: 'inline-flex', gap: 0.75, alignItems: 'center', fontWeight: 800 }}
+                    >
+                      เปิดโพสต์ Facebook <OpenInNewIcon fontSize="small" />
+                    </Link>
+                  </Stack>
+                </Paper>
+              )}
             </>
           )}
         </Stack>

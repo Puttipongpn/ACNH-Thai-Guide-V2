@@ -1,6 +1,8 @@
 import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import type { ContentBlock } from '../types/api';
+import { publicPalette } from '../theme/appTheme';
+import { resolveUploadUrl, softBorder, softShadow } from '../utils/publicStyle';
 
 type Props = {
   block: ContentBlock;
@@ -49,22 +51,25 @@ export default function ContentBlockRenderer({ block }: Props) {
     const image = (
       <Box
         component="img"
-        src={block.metadata.image_url}
+        src={resolveUploadUrl(block.metadata.image_url)}
         alt={block.metadata.alt_text ?? ''}
         sx={{
           width: '100%',
-          borderRadius: 2,
+          borderRadius: 4,
           display: 'block',
           objectFit: 'cover',
           maxHeight: layout === 'full_width' ? 520 : 360,
-          border: '1px solid rgba(111, 102, 85, 0.12)',
+          border: softBorder,
+          bgcolor: publicPalette.creamDeep,
         }}
       />
     );
     const text = (
       <Stack spacing={1.25}>
         {block.metadata.caption && (
-          <Typography sx={{ fontWeight: 800, color: 'text.primary' }}>{block.metadata.caption}</Typography>
+          <Typography variant="h6" sx={{ fontSize: 18 }}>
+            {block.metadata.caption}
+          </Typography>
         )}
         {block.metadata.text && (
           <Typography sx={{ color: 'text.secondary', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
@@ -97,6 +102,7 @@ export default function ContentBlockRenderer({ block }: Props) {
 
   if (block.type === 'VIDEO_BLOCK') {
     const videoUrl = block.metadata.url ?? '';
+    const resolvedVideoUrl = resolveUploadUrl(videoUrl);
     const embedUrl = youtubeEmbedUrl(videoUrl);
     return (
       <Stack spacing={1.5}>
@@ -114,8 +120,8 @@ export default function ContentBlockRenderer({ block }: Props) {
               width: '100%',
               aspectRatio: '16 / 9',
               border: 0,
-              borderRadius: 2,
-              boxShadow: '0 12px 28px rgba(154, 197, 216, 0.22)',
+              borderRadius: 4,
+              boxShadow: '0 12px 28px rgba(83, 111, 87, 0.14)',
             }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -123,18 +129,18 @@ export default function ContentBlockRenderer({ block }: Props) {
         ) : isDirectVideoUrl(videoUrl) ? (
           <Box
             component="video"
-            src={videoUrl}
+            src={resolvedVideoUrl}
             controls
             sx={{
               width: '100%',
-              borderRadius: 2,
-              border: '1px solid rgba(111, 102, 85, 0.14)',
-              boxShadow: '0 12px 28px rgba(154, 197, 216, 0.22)',
+              borderRadius: 4,
+              border: softBorder,
+              boxShadow: '0 12px 28px rgba(83, 111, 87, 0.14)',
             }}
           />
         ) : (
           <Button
-            href={videoUrl}
+            href={resolvedVideoUrl}
             target="_blank"
             rel="noreferrer"
             variant="outlined"
@@ -152,10 +158,11 @@ export default function ContentBlockRenderer({ block }: Props) {
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, md: 3 },
-        bgcolor: '#e5f4dc',
-        border: '1px solid rgba(127, 183, 126, 0.28)',
-        boxShadow: '0 12px 30px rgba(127, 183, 126, 0.18)',
+        p: { xs: 2.5, md: 3.5 },
+        bgcolor: 'rgba(251, 240, 202, 0.72)',
+        border: '1px solid rgba(241, 229, 201, 0.9)',
+        borderRadius: 5,
+        boxShadow: softShadow,
       }}
     >
       <Stack spacing={1}>

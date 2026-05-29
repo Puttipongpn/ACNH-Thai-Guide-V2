@@ -1,24 +1,24 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Alert, Box, Button, Container, InputAdornment, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import { Alert, Box, Button, Chip, Container, Paper, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SearchIcon from '@mui/icons-material/Search';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import EmptyState from '../components/EmptyState';
 import PostCard from '../components/PostCard';
+import SearchBar from '../components/SearchBar';
 import { searchPosts } from '../services/postService';
+import { publicPalette } from '../theme/appTheme';
 import type { Post } from '../types/api';
+import { softBorder, softShadow } from '../utils/publicStyle';
 
 export default function SearchResultsPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activeQuery = useMemo(() => searchParams.get('q')?.trim() ?? '', [searchParams]);
-  const [query, setQuery] = useState(activeQuery);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setQuery(activeQuery);
     let active = true;
 
     async function loadResults() {
@@ -48,82 +48,84 @@ export default function SearchResultsPage() {
     };
   }, [activeQuery]);
 
-  function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const normalizedQuery = query.trim();
-    if (!normalizedQuery) return;
-    navigate(`/search?q=${encodeURIComponent(normalizedQuery)}`);
-  }
-
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(180deg, #fff8e8 0%, #e5f4dc 58%, #d8eef7 100%)',
         py: { xs: 3, md: 6 },
       }}
     >
       <Container maxWidth="lg">
         <Stack spacing={3}>
           <Button component={RouterLink} to="/" variant="outlined" startIcon={<ArrowBackIcon />} sx={{ alignSelf: 'flex-start' }}>
-            Home
+            หน้าแรก
           </Button>
           <Paper
             elevation={0}
             sx={{
-              p: { xs: 3, md: 4 },
-              border: '1px solid rgba(111, 102, 85, 0.14)',
-              boxShadow: '0 18px 42px rgba(127, 183, 126, 0.18)',
+              p: { xs: 3, md: 5 },
+              border: softBorder,
+              boxShadow: softShadow,
+              bgcolor: 'rgba(255, 253, 244, 0.76)',
+              borderRadius: 7,
             }}
           >
-            <Stack spacing={2}>
-              <Typography variant="h1" sx={{ fontSize: { xs: 34, md: 48 } }}>
-                Search Guides
+            <Stack spacing={2.5}>
+              <Typography
+                sx={{
+                  color: publicPalette.leafDeep,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                ค้นหาสารบัญ
               </Typography>
-              <Box component="form" onSubmit={handleSearch}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
-                  <TextField
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search by title, description, tag, or category"
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
+              <Typography variant="h1" sx={{ fontSize: { xs: 36, md: 50 } }}>
+                ค้นหาไกด์ของเกาะ
+              </Typography>
+              <Typography sx={{ color: 'text.secondary', lineHeight: 1.8, maxWidth: 720 }}>
+                ค้นหาได้จากชื่อ คำอธิบาย หมวดหมู่ tag เดือน หรือประเภทเนื้อหา
+              </Typography>
+              <SearchBar key={activeQuery} initialValue={activeQuery} />
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                {['มือใหม่', 'NPC', 'DLC', 'พฤษภาคม'].map((term) => (
+                  <Chip
+                    key={term}
+                    label={term}
+                    size="small"
+                    onClick={() => navigate(`/search?q=${encodeURIComponent(term)}`)}
+                    sx={{ bgcolor: publicPalette.leafPale, cursor: 'pointer' }}
                   />
-                  <Button type="submit" variant="contained" startIcon={<SearchIcon />} sx={{ px: 3 }}>
-                    Search
-                  </Button>
-                </Stack>
-              </Box>
-              {activeQuery && (
-                <Typography sx={{ color: 'text.secondary' }}>
-                  Results for "{activeQuery}"
-                </Typography>
-              )}
+                ))}
+              </Stack>
             </Stack>
           </Paper>
 
           {loading && <Alert severity="info">Searching the island notebook...</Alert>}
           {error && <Alert severity="error">{error}</Alert>}
-          {!loading && !activeQuery && <EmptyState message="Type a search term to find published community guides." />}
-          {!loading && activeQuery && posts.length === 0 && <EmptyState message="No published guides matched this search." />}
+          {!loading && !activeQuery && <EmptyState message="พิมพ์คำค้นเพื่อหา published community guides" />}
+          {!loading && activeQuery && posts.length === 0 && <EmptyState message="ยังไม่พบ published guides ที่ตรงกับคำค้นนี้ ลองใช้คำว่า มือใหม่, NPC, DLC หรือ พฤษภาคม" />}
           {posts.length > 0 && (
-            <Box
-              sx={{
-                display: 'grid',
-                gap: 2,
-                gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-              }}
-            >
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </Box>
+            <Stack spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                <Typography variant="h2" sx={{ fontSize: { xs: 26, md: 34 } }}>
+                  {activeQuery ? `ผลการค้นหา "${activeQuery}"` : 'รายการทั้งหมด'}
+                </Typography>
+                <Typography sx={{ color: 'text.secondary' }}>{posts.length} รายการ</Typography>
+              </Stack>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gap: 2,
+                  gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                }}
+              >
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </Box>
+            </Stack>
           )}
         </Stack>
       </Container>

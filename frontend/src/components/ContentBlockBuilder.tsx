@@ -391,6 +391,9 @@ export default function ContentBlockBuilder({ postId }: Props) {
 
               {form.type === 'IMAGE_BLOCK' && (
                 <>
+                  <Alert severity="info">
+                    Choose from Media Library, upload a new image, or paste an image URL manually. The selected URL is saved to image_url.
+                  </Alert>
                   <MediaPicker
                     kind="image"
                     selectedUrl={form.metadata.image_url}
@@ -403,6 +406,7 @@ export default function ContentBlockBuilder({ postId }: Props) {
                   />
                   <TextField
                     label="Image URL"
+                    helperText="Required. You can paste an external URL or use an uploaded /uploads URL."
                     value={form.metadata.image_url ?? ''}
                     onChange={(event) => updateMetadata('image_url', event.target.value)}
                     required
@@ -410,6 +414,7 @@ export default function ContentBlockBuilder({ postId }: Props) {
                   />
                   <TextField
                     label="Alt text"
+                    helperText="Describe the image for accessibility."
                     value={form.metadata.alt_text ?? ''}
                     onChange={(event) => updateMetadata('alt_text', event.target.value)}
                     fullWidth
@@ -429,23 +434,46 @@ export default function ContentBlockBuilder({ postId }: Props) {
                   </FormControl>
                   <TextField
                     label="Caption"
+                    helperText="Optional text shown near the image."
                     value={form.metadata.caption ?? ''}
                     onChange={(event) => updateMetadata('caption', event.target.value)}
                     fullWidth
                   />
                   <TextField
                     label="Side text"
+                    helperText="Optional. Used with left/right image layouts."
                     value={form.metadata.text ?? ''}
                     onChange={(event) => updateMetadata('text', event.target.value)}
                     multiline
                     minRows={3}
                     fullWidth
                   />
+                  {form.metadata.image_url && (
+                    <Paper elevation={0} sx={{ p: 1.5, border: '1px solid rgba(111, 102, 85, 0.14)', bgcolor: '#fff8e8' }}>
+                      <Typography sx={{ fontWeight: 800, mb: 1 }}>Image preview</Typography>
+                      <Box
+                        component="img"
+                        src={form.metadata.image_url}
+                        alt={form.metadata.alt_text ?? ''}
+                        sx={{
+                          width: '100%',
+                          maxHeight: 280,
+                          objectFit: 'contain',
+                          borderRadius: 1.5,
+                          bgcolor: '#fffdf4',
+                          border: '1px solid rgba(111, 102, 85, 0.12)',
+                        }}
+                      />
+                    </Paper>
+                  )}
                 </>
               )}
 
               {form.type === 'VIDEO_BLOCK' && (
                 <>
+                  <Alert severity="info">
+                    Choose an uploaded video if available, or paste a YouTube/direct video URL.
+                  </Alert>
                   <MediaPicker
                     kind="video"
                     selectedUrl={form.metadata.url}
@@ -458,17 +486,27 @@ export default function ContentBlockBuilder({ postId }: Props) {
                   />
                   <TextField
                     label="Video title"
+                    helperText="Optional title shown above the video."
                     value={form.metadata.title ?? ''}
                     onChange={(event) => updateMetadata('title', event.target.value)}
                     fullWidth
                   />
                   <TextField
                     label="Video URL"
+                    helperText="Required. Supports YouTube links, direct MP4/WebM URLs, or uploaded video URLs."
                     value={form.metadata.url ?? ''}
                     onChange={(event) => updateMetadata('url', event.target.value)}
                     required
                     fullWidth
                   />
+                  {form.metadata.url && (
+                    <Paper elevation={0} sx={{ p: 1.5, border: '1px solid rgba(111, 102, 85, 0.14)', bgcolor: '#fff8e8' }}>
+                      <Typography sx={{ fontWeight: 800 }}>Video selected</Typography>
+                      <Typography sx={{ color: 'text.secondary', fontSize: 14, overflowWrap: 'anywhere' }}>
+                        {form.metadata.url}
+                      </Typography>
+                    </Paper>
+                  )}
                 </>
               )}
 

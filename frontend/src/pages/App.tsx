@@ -1,30 +1,25 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Box,
   Button,
-  Card,
-  CardActionArea,
-  CardContent,
   Chip,
   Container,
-  InputAdornment,
   Paper,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
-import CategoryIcon from '@mui/icons-material/Category';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
-import SearchIcon from '@mui/icons-material/Search';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import CategoryCard from '../components/CategoryCard';
 import EmptyState from '../components/EmptyState';
 import PostCard from '../components/PostCard';
+import SearchBar from '../components/SearchBar';
 import { listCategories } from '../services/categoryService';
 import { getHealthStatus } from '../services/healthService';
 import { listPosts } from '../services/postService';
+import { publicPalette } from '../theme/appTheme';
 import type { Category, HealthStatus, Post } from '../types/api';
+import { cardShadow, publicShellBackground, softBorder, softShadow } from '../utils/publicStyle';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -34,8 +29,8 @@ export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [query, setQuery] = useState('');
   const [error, setError] = useState('');
+  const imageFriendlyPost = useMemo(() => posts.find((post) => post.description) ?? posts[0], [posts]);
 
   useEffect(() => {
     let active = true;
@@ -66,164 +61,265 @@ export default function App() {
     };
   }, []);
 
-  function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const normalizedQuery = query.trim();
-    if (!normalizedQuery) return;
-    navigate(`/search?q=${encodeURIComponent(normalizedQuery)}`);
-  }
-
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(180deg, #fff8e8 0%, #e5f4dc 52%, #d8eef7 100%)',
-        py: { xs: 4, md: 7 },
+        background: publicShellBackground,
       }}
     >
-      <Container maxWidth="lg">
-        <Stack spacing={5}>
+      <Box
+        component="section"
+        sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            width: 280,
+            height: 280,
+            borderRadius: '50%',
+            bgcolor: 'rgba(146, 189, 145, 0.22)',
+            top: 24,
+            right: { xs: -170, md: '8%' },
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            width: 240,
+            height: 240,
+            borderRadius: '50%',
+            bgcolor: 'rgba(222, 239, 240, 0.65)',
+            left: { xs: -160, md: '3%' },
+            bottom: 8,
+          },
+        }}
+      >
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 4, md: 8 } }}>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
-            spacing={3}
-            alignItems={{ xs: 'stretch', md: 'center' }}
+            spacing={{ xs: 4, md: 6 }}
+            alignItems="center"
             justifyContent="space-between"
           >
             <Box sx={{ maxWidth: 760 }}>
-              <Chip icon={<LocalFloristIcon />} label="Cozy island handbook" color="primary" sx={{ mb: 2 }} />
-              <Typography variant="h1" sx={{ fontSize: { xs: 38, md: 58 } }}>
-                Animal Crossing New Horizons Community Index
+              <Typography
+                sx={{
+                  mb: 1.5,
+                  color: publicPalette.leafDeep,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                }}
+              >
+                Animal Crossing: New Horizons ภาษาไทย
+              </Typography>
+              <Typography variant="h1" sx={{ fontSize: { xs: 39, md: 58 }, maxWidth: 760 }}>
+                สมุดคู่มือเกาะ
+                <Box component="br" sx={{ display: { xs: 'none', sm: 'block' } }} /> ที่หาโพสต์เก่าเจอง่ายขึ้น
               </Typography>
               <Typography
                 variant="h2"
-                sx={{ color: 'text.secondary', fontSize: { xs: 20, md: 26 }, fontWeight: 500, mt: 2 }}
+                sx={{
+                  color: 'text.secondary',
+                  fontFamily: 'inherit',
+                  fontSize: { xs: 17, md: 20 },
+                  fontWeight: 500,
+                  lineHeight: 1.9,
+                  mt: 2,
+                  maxWidth: 680,
+                }}
               >
-                Search Thai community guides, friendly tips, island notes, and useful references in one warm place.
+                รวมโพสต์ไกด์ กฎสำคัญ เทคนิค และบันทึกชุมชนไว้ในหน้าเดียว
+                เพื่อให้เปิดอ่านบนมือถือได้แบบสบาย ๆ เหมือนพลิกสมุดโน้ตประจำเกาะ
               </Typography>
-              <Box component="form" onSubmit={handleSearch} sx={{ mt: 3 }}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
-                  <TextField
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search guides, tags, categories..."
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
+              <Box sx={{ mt: 4, maxWidth: 700 }}>
+                <SearchBar />
+              </Box>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2.25, color: 'text.secondary' }}>
+                <Typography sx={{ fontSize: 13, mr: 0.5 }}>ลองค้นหา:</Typography>
+                {['NSO', 'มือใหม่', 'Celeste', 'รายเดือน', 'กุหลาบน้ำเงิน'].map((term) => (
+                  <Chip
+                    key={term}
+                    label={term}
+                    size="small"
+                    onClick={() => navigate(`/search?q=${encodeURIComponent(term)}`)}
+                    sx={{ bgcolor: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}
                   />
-                  <Button type="submit" variant="contained" startIcon={<SearchIcon />} sx={{ px: 3 }}>
-                    Search
-                  </Button>
-                </Stack>
+                ))}
+              </Stack>
+              <Box
+                sx={{
+                  mt: 4,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                  gap: 1.5,
+                  maxWidth: 640,
+                }}
+              >
+                {[
+                  [categories.length, 'หมวดหลัก'],
+                  [posts.length, 'ไกด์ล่าสุด'],
+                  [health?.database === 'ok' ? 'OK' : '...', 'ฐานข้อมูล'],
+                ].map(([value, label]) => (
+                  <Paper
+                    key={label}
+                    elevation={0}
+                    sx={{
+                      p: { xs: 1.5, sm: 2 },
+                      borderRadius: 4,
+                      border: '1px solid rgba(255,255,255,0.7)',
+                      bgcolor: 'rgba(255,255,255,0.62)',
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontSize: { xs: 20, sm: 26 } }}>
+                      {value}
+                    </Typography>
+                    <Typography sx={{ color: 'text.secondary', fontSize: 12, mt: 0.5 }}>{label}</Typography>
+                  </Paper>
+                ))}
               </Box>
             </Box>
 
             <Paper
               elevation={0}
               sx={{
-                border: '1px solid rgba(111, 102, 85, 0.16)',
-                boxShadow: '0 18px 42px rgba(127, 183, 126, 0.22)',
-                p: 3,
-                width: { xs: '100%', md: 320 },
+                border: `1px solid ${publicPalette.creamDeep}`,
+                boxShadow: softShadow,
+                p: 0,
+                width: { xs: '100%', md: 350 },
+                overflow: 'hidden',
+                transform: { md: 'rotate(1deg)' },
+                borderRadius: 7,
               }}
             >
-              <Stack spacing={2}>
-                <Typography variant="h6">API Status</Typography>
-                {loadState === 'loading' && <Alert severity="info">Checking the island radio...</Alert>}
-                {loadState === 'ready' && (
-                  <Alert severity="success">Backend online. Database {health?.database ?? 'unknown'}.</Alert>
-                )}
-                {loadState === 'error' && (
-                  <Alert severity="error">Backend is not reachable yet. Start Docker Compose and try again.</Alert>
-                )}
-                <Stack direction="row" spacing={1}>
-                  <Chip label={`API: ${health?.api ?? loadState}`} size="small" />
-                  <Chip label={`DB: ${health?.database ?? 'pending'}`} size="small" />
+              <Box
+                sx={{
+                  height: 170,
+                  bgcolor: publicPalette.creamDeep,
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: 48,
+                }}
+              >
+                🌿
+              </Box>
+              <Stack spacing={2} sx={{ p: 3 }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ color: 'text.secondary', fontSize: 14 }}>
+                  <Typography sx={{ fontSize: 14 }}>บันทึกเกาะวันนี้</Typography>
+                  <Typography sx={{ fontSize: 16 }}>🏝️</Typography>
                 </Stack>
-                <Button component={RouterLink} to="/admin/posts" variant="outlined" startIcon={<FavoriteIcon />}>
-                  Admin
-                </Button>
+                <Typography variant="h6" sx={{ fontSize: 22 }}>
+                  เริ่มอ่านตรงไหนดี?
+                </Typography>
+                <Typography sx={{ color: 'text.secondary', lineHeight: 1.8, fontSize: 14 }}>
+                  ถ้าเพิ่งเข้ากลุ่ม ให้เริ่มจากกฎสำคัญ, NSO และ Beginner Guide ก่อน
+                </Typography>
+                {imageFriendlyPost && (
+                  <Button component={RouterLink} to={`/posts/${imageFriendlyPost.id}`} variant="contained" fullWidth>
+                    อ่านไกด์ล่าสุด
+                  </Button>
+                )}
+                <Box>
+                  {loadState === 'loading' && <Alert severity="info">กำลังเช็กวิทยุเกาะ...</Alert>}
+                  {loadState === 'ready' && <Alert severity="success">API พร้อมใช้งาน ฐานข้อมูล {health?.database}</Alert>}
+                  {loadState === 'error' && <Alert severity="error">Backend ยังไม่พร้อมใช้งาน</Alert>}
+                </Box>
               </Stack>
             </Paper>
           </Stack>
+        </Container>
+      </Box>
 
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+        <Stack spacing={6}>
           {error && <Alert severity="error">{error}</Alert>}
 
           <Stack spacing={2}>
-            <Typography variant="h2" sx={{ fontSize: { xs: 26, md: 34 } }}>
-              Categories
-            </Typography>
+            <Box>
+              <Typography sx={{ color: publicPalette.leafDeep, fontSize: 12, fontWeight: 800, letterSpacing: '0.14em' }}>
+                เลือกอ่านตามเรื่อง
+              </Typography>
+              <Typography variant="h2" sx={{ fontSize: { xs: 28, md: 36 }, mt: 1 }}>
+                หมวดที่ค้นหาบ่อย
+              </Typography>
+              <Typography sx={{ color: 'text.secondary', mt: 1 }}>
+                กดที่การ์ดเพื่อเปิดสารบัญย่อยของแต่ละหัวข้อ
+              </Typography>
+            </Box>
             {categories.length === 0 ? (
-              <EmptyState message="No categories are on the island map yet." />
+              <EmptyState message="ยังไม่มีหมวดบนแผนที่เกาะตอนนี้" />
             ) : (
               <Box
                 sx={{
                   display: 'grid',
                   gap: 2,
-                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
                 }}
               >
                 {categories.map((category) => (
-                  <Box key={category.id}>
-                    <Card
-                      elevation={0}
-                      sx={{
-                        height: '100%',
-                        border: '1px solid rgba(111, 102, 85, 0.14)',
-                        bgcolor: '#fffdf4',
-                        boxShadow: '0 14px 32px rgba(154, 197, 216, 0.18)',
-                      }}
-                    >
-                      <CardActionArea component={RouterLink} to={`/categories/${category.id}`} sx={{ height: '100%' }}>
-                        <CardContent>
-                          <Stack spacing={1.5}>
-                            <CategoryIcon color="primary" />
-                            <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                              {category.name}
-                            </Typography>
-                            <Typography sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
-                              {category.description || 'Community notes gathered for this island topic.'}
-                            </Typography>
-                          </Stack>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </Box>
+                  <CategoryCard key={category.id} category={category} />
                 ))}
               </Box>
             )}
           </Stack>
+
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, md: 4 },
+              borderRadius: 7,
+              border: softBorder,
+              bgcolor: 'rgba(226, 239, 222, 0.45)',
+              boxShadow: cardShadow,
+            }}
+          >
+            <Stack spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1}>
+                <Box>
+                  <Typography sx={{ color: publicPalette.leafDeep, fontSize: 12, fontWeight: 800, letterSpacing: '0.14em' }}>
+                    สำหรับผู้เล่นใหม่
+                  </Typography>
+                  <Typography variant="h2" sx={{ fontSize: { xs: 28, md: 36 }, mt: 1 }}>
+                    อ่านก่อน แล้วค่อยบินอย่างมั่นใจ
+                  </Typography>
+                  <Typography sx={{ color: 'text.secondary', mt: 1 }}>
+                    Latest published guides from the community notebook.
+                  </Typography>
+                </Box>
+              </Stack>
+              {posts.length === 0 ? (
+                <EmptyState message="ยังไม่มี published guides ตอนนี้ Drafts ยังเก็บไว้อย่างปลอดภัยใน admin" />
+              ) : (
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gap: 2,
+                    gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                  }}
+                >
+                  {posts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                </Box>
+              )}
+            </Stack>
+          </Paper>
 
           <Stack spacing={2}>
             <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1}>
               <Box>
-                <Typography variant="h2" sx={{ fontSize: { xs: 26, md: 34 } }}>
-                  Featured Guides
+                <Typography variant="h2" sx={{ fontSize: { xs: 28, md: 36 } }}>
+                  ตามหาไกด์เพิ่มเติม
                 </Typography>
-                <Typography sx={{ color: 'text.secondary' }}>Latest published guides from the community notebook.</Typography>
+                <Typography sx={{ color: 'text.secondary' }}>
+                  ใช้ช่องค้นหาเพื่อหาโพสต์จากชื่อ หมวด tag หรือคำอธิบาย
+                </Typography>
               </Box>
             </Stack>
-            {posts.length === 0 ? (
-              <EmptyState message="No published guides yet. Drafts are still tucked safely in admin." />
-            ) : (
-              <Box
-                sx={{
-                  display: 'grid',
-                  gap: 2,
-                  gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-                }}
-              >
-                {posts.map((post) => (
-                  <Box key={post.id}>
-                    <PostCard post={post} />
-                  </Box>
-                ))}
-              </Box>
-            )}
+            <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, borderRadius: 6, border: softBorder, bgcolor: publicPalette.paper }}>
+              <SearchBar compact />
+            </Paper>
           </Stack>
         </Stack>
       </Container>

@@ -1,7 +1,7 @@
 # Current Status
 
 Project Stage:
-Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish + Media Upload + Development Seed Data + Final QA
+Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish + Media Upload + Development Seed Data + Final QA + Safe Facebook Import Command
 
 Completed:
 - Docker Compose foundation
@@ -183,11 +183,68 @@ Completed:
 - Facebook import candidate summary: 6 high-confidence drafts, 9 review-needed candidates, 15 candidates with image references, 50 referenced local images
 - Raw Facebook files were not modified, deleted, or overwritten
 - No uploaded media was copied and no app data was changed during the import analysis step
+- v1 UI/style analysis completed without modifying v2 UI files
+- Older v1 frontend project inspected at /Users/panupong.ma/Documents/Codex/2026-05-27/animal-crossing-new-horizons-facebook-group
+- Created docs/v1-ui-style-analysis.md with v1 structure, visual strengths, useful files/assets, compatibility risks, and recommended migration steps
+- Created data/v1-style-migration-candidates.json with assets, style references, components to recreate, theme values, and phased migration steps
+- v1 analysis found the strongest migration candidates are Mali + Noto Sans Thai fonts, the softer pastel palette, PublicLayout/header/footer/mobile bottom nav, Home hero/search patterns, card treatments, article detail styling, and curated public content images
+- No v1 assets were copied and no v2 UI implementation was changed during this planning step
+- Applied v1 visual style to v2 public pages only
+- Added Mali display font and Noto Sans Thai body/UI font through frontend index font loading and public MUI theme typography
+- Added public-only MUI theme with v1 cream, leaf, sky, peach, butter, rose, ink, and muted palette values while keeping the base admin theme intact
+- Added public-only layout with sticky cozy cream header, brand lockup, footer, desktop public nav, and mobile bottom navigation
+- Reworked public Home page with Thai-first hero, search bar, suggestion chips, stat chips, note-style panel, category cards, and latest published posts
+- Added reusable public SearchBar and CategoryCard components translated into Material UI
+- Improved public PostCard with softer cards, category icons, tag pills, optional content-block thumbnail, and image count badge
+- Improved Category, Search, and Post Detail public pages with v1-inspired hero/paper/card layouts and friendly empty states
+- Improved ContentBlockRenderer styling for text, image layouts, video blocks, and highlight note blocks
+- Preserved backend behavior, admin CRUD behavior, existing API integrations, and existing routes
+- No v1 assets were copied during the public style migration
+- Frontend production build passed with Node 22; Vite reported only the existing large chunk warning
+- Docker Compose build/start passed after the public UI changes
+- Public route verification passed: home, category, search, and post detail returned HTTP 200
+- Admin route smoke verification passed: login, admin categories, admin tags, and admin posts returned HTTP 200
+- Admin usability cleanup completed for posts, categories, tags, content builder, and media workflow
+- Added shared admin navigation with Posts, Categories, Tags, Media, and Logout links
+- Added Admin Media Library page at /admin/media with upload, preview, file metadata, copy URL, and delete actions
+- Improved Admin Posts workflow with clearer Create Post action, Edit Content action, content block counts, and step guidance for post info, content blocks, and images/video
+- Improved Content Builder guidance for Text, Highlight, Image, and Video blocks
+- IMAGE_BLOCK editor now makes media library selection, upload new image, manual image URL, layout choice, and image preview clearer
+- VIDEO_BLOCK editor now makes uploaded video selection/manual URL and selected video preview/link clearer
+- Admin media upload UI now labels Choose from Media Library and Upload new media actions more clearly
+- Backend media validation now explicitly allows image/jpeg, image/png, image/webp, image/gif, video/mp4, and video/webm only
+- Frontend build passed after admin UX and media workflow cleanup
+- Backend build passed after media validation cleanup
+- Docker Compose build/start passed after admin UX and media workflow cleanup
+- Verification passed: admin login, media upload, public uploaded file serving, media delete, temporary category/tag/post CRUD, temporary IMAGE_BLOCK creation, and public content block read
+- Route smoke verification passed after admin cleanup: public home, admin posts, admin media, and login returned HTTP 200
+- Safe local-only Facebook candidate import command added at backend/cmd/import-facebook
+- Import command reads data/facebook-import-candidates.json and does not scrape, open, or crawl Facebook URLs
+- Import command resolves local image paths from /Users/panupong.ma/Documents/Codex/2026-05-28/facebook-group-private-animal-crossing-new
+- Import command imports every candidate as draft regardless of candidate status
+- Import command preserves source_url or falls back to the main Facebook group index reference URL when missing
+- Import command checks duplicates by slug, source_url, and source_file/import slug metadata before creating posts/content
+- Import command ensures referenced categories and tags exist without duplicating existing records
+- Import command copies usable local images into backend/uploads/imported-facebook and creates media_files rows when possible
+- Import command rewrites imported IMAGE_BLOCK metadata.image_url to /uploads/imported-facebook/<filename>
+- Import command preserves source_file, source_url, confidence, reason, and review_needed markers in content block metadata
+- Review-needed imported drafts are clearly marked in the post description and block metadata
+- Docker Compose upload persistence now uses local backend/uploads bind mount so imported/uploaded media remains in project local storage
+- README updated with safe Facebook candidate import instructions
+- Backend server build passed after import command changes
+- Facebook import command build passed
+- Frontend production build passed after upload URL rendering support; Vite reported only the existing large chunk warning
+- Docker Compose build/start passed after import and upload persistence changes
+- Safe importer verification passed: first completed import resulted in 15 imported draft posts, 50 copied/imported images, 0 missing images, and 9 review-needed candidates
+- Safe importer idempotency verification passed: rerunning the import created 0 posts, skipped 15 duplicates, imported 0 images, and reported 0 errors
+- Admin API verification passed: all 15 imported candidate posts appear in Admin Posts as draft
+- Public API verification passed: imported draft posts do not appear in public post listings
+- Public upload serving verification passed: imported image under /uploads/imported-facebook returned HTTP 200
 
 Next Task:
-- Review Facebook import candidates manually
-- Build a separate idempotent import command after approval
-- Copy approved images into backend/uploads/imported-facebook during the future import step
+- Review imported Facebook draft posts in Admin Posts and decide which drafts are safe to publish
+- Manually inspect review_needed drafts against the local export before publishing
+- Consider code splitting later to reduce frontend bundle size
 
 Notes:
 - Docker Compose stack is currently running in detached mode.
@@ -219,6 +276,14 @@ Notes:
 - Recommended import source is acnh_curated_post_images.json supported by acnh_curated_image_assets.json and curated_post_images/.
 - acnh_raw_extraction.json is retained as trace evidence but should not be imported directly because it is large, noisy, and duplicated.
 - ocr_image_assets should be treated as review/reference material because several .png files appear to be derived assets with mismatched image encoding.
+- Latest v1 UI analysis found v1 is frontend-only React/Vite/Tailwind with static data, not compatible for direct copy into v2.
+- v1 public image assets include 307 files under public/content-images/curated-post-images, about 94 MB, so selective copy or backend media import should be considered.
+- v1 static data and custom router should remain reference material only because v2 already has React Router and backend-backed data.
+- Latest public UI migration intentionally did not copy v1 assets, did not add Tailwind, did not modify backend files, and did not change admin CRUD flows.
+- Frontend build should be run with Node.js 20+; the system default node is older, while /opt/homebrew/bin/node v22.10.0 works.
+- Latest admin UX cleanup preserved public UI style and did not change backend public API behavior.
+- Uploaded files continue to use local backend/uploads storage mounted into Docker Compose at /app/uploads.
+- Latest safe Facebook import verification found no duplicate post, content block, tag, category, media, draft visibility, image copy, Go build, TypeScript build, or Docker Compose issues.
 
 Definition of Done:
 docker compose up works

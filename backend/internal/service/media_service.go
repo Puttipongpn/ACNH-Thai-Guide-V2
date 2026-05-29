@@ -150,7 +150,12 @@ func (s *mediaService) MaxUploadBytes() int64 {
 }
 
 func isSupportedMediaType(mimeType string) bool {
-	return strings.HasPrefix(mimeType, "image/") || strings.HasPrefix(mimeType, "video/")
+	switch mimeType {
+	case "image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm":
+		return true
+	default:
+		return false
+	}
 }
 
 func extensionForMimeType(mimeType string) string {

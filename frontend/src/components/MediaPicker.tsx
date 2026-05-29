@@ -103,11 +103,11 @@ export default function MediaPicker({ kind, selectedUrl, onSelect }: Props) {
           <Box>
             <Typography sx={{ fontWeight: 800 }}>{kind === 'image' ? 'Image Library' : 'Video Library'}</Typography>
             <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
-              Upload or choose an existing file.
+              Choose from Media Library or upload a new {kind}.
             </Typography>
           </Box>
           <Button component="label" variant="outlined" startIcon={<CloudUploadIcon />} disabled={uploading}>
-            Upload
+            Upload new {kind}
             <input
               hidden
               type="file"
