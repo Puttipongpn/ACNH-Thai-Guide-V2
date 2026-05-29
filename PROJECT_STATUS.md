@@ -1,7 +1,7 @@
 # Current Status
 
 Project Stage:
-Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish + Media Upload + Development Seed Data
+Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish + Media Upload + Development Seed Data + Final QA
 
 Completed:
 - Docker Compose foundation
@@ -162,6 +162,20 @@ Completed:
 - Seeded published posts include TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, and HIGHLIGHT_BLOCK examples
 - Seed verification passed: public home/latest posts show seeded published posts, category pages show seeded posts, post detail renders seeded content blocks, draft posts stay hidden from public pages
 - Seed idempotency verification passed after backend restart with no duplicate categories, tags, posts, or content blocks
+- Final QA frontend production build passed
+- Final QA backend production build passed
+- Final QA Docker Compose rebuild/start passed
+- Final QA verified main public pages: home, login, category detail, post detail, and search
+- Final QA verified admin pages: categories, tags, and posts
+- Final QA verified login succeeds and invalid credentials fail
+- Final QA verified admin write routes and admin media routes require JWT
+- Final QA verified invalid JWT is rejected by the API
+- Final QA added frontend API 401 handling to clear admin token and redirect admin pages to login
+- Final QA verified category, tag, post, and content block CRUD flows
+- Final QA verified content blocks still render through public APIs
+- Final QA verified media upload, public media serving, media persistence after backend restart, and media deletion
+- Final QA verified seed data remains idempotent after backend restart
+- README updated with current Docker, admin, seed data, uploads, and useful API information
 
 Next Task:
 - Improve public guide discovery and filtering
@@ -189,6 +203,7 @@ Notes:
 - Latest UI polish verification found no TypeScript build issues or major route regressions.
 - Latest media upload verification found no upload, storage, public serving, image block, TypeScript, Go compilation, Docker volume, or delete issues.
 - Latest seed data verification found no startup, idempotency, public visibility, draft filtering, content block rendering, TypeScript, or Go compilation issues.
+- Latest final QA found no build, Docker, authentication, CRUD, content block, media persistence, seed idempotency, or major route issues.
 - Browser automation was unavailable in this session, but frontend route /admin/categories returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but frontend route /posts/:id returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but public home, category, post detail, and search routes returned HTTP 200 and frontend production build passed.
