@@ -18,6 +18,15 @@ func NewPostHandler(postService service.PostService) *PostHandler {
 }
 
 func (h *PostHandler) List(c echo.Context) error {
+	posts, err := h.postService.ListPublished(c.QueryParam("page"), c.QueryParam("limit"))
+	if err != nil {
+		return internalError(c, "Failed to load posts")
+	}
+
+	return success(c, http.StatusOK, posts)
+}
+
+func (h *PostHandler) AdminList(c echo.Context) error {
 	posts, err := h.postService.List()
 	if err != nil {
 		return internalError(c, "Failed to load posts")
@@ -26,8 +35,29 @@ func (h *PostHandler) List(c echo.Context) error {
 	return success(c, http.StatusOK, posts)
 }
 
+func (h *PostHandler) ListByCategory(c echo.Context) error {
+	posts, err := h.postService.ListPublishedByCategory(c.Param("category_id"), c.QueryParam("page"), c.QueryParam("limit"))
+	if errors.Is(err, service.ErrPostCategoryNotFound) {
+		return errorResponse(c, http.StatusNotFound, "Category not found")
+	}
+	if err != nil {
+		return internalError(c, "Failed to load posts")
+	}
+
+	return success(c, http.StatusOK, posts)
+}
+
+func (h *PostHandler) Search(c echo.Context) error {
+	posts, err := h.postService.SearchPublished(c.QueryParam("q"), c.QueryParam("page"), c.QueryParam("limit"))
+	if err != nil {
+		return internalError(c, "Failed to search posts")
+	}
+
+	return success(c, http.StatusOK, posts)
+}
+
 func (h *PostHandler) Get(c echo.Context) error {
-	post, err := h.postService.GetByID(c.Param("id"))
+	post, err := h.postService.GetPublishedByID(c.Param("id"))
 	if errors.Is(err, service.ErrPostNotFound) {
 		return errorResponse(c, http.StatusNotFound, "Post not found")
 	}

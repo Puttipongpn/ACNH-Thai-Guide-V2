@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"acnh-thailand/backend/internal/model"
@@ -33,7 +34,11 @@ type PostInput struct {
 
 type PostService interface {
 	List() ([]model.Post, error)
+	ListPublished(page string, limit string) ([]model.Post, error)
+	ListPublishedByCategory(categoryID string, page string, limit string) ([]model.Post, error)
+	SearchPublished(query string, page string, limit string) ([]model.Post, error)
 	GetByID(id string) (*model.Post, error)
+	GetPublishedByID(id string) (*model.Post, error)
 	Create(input PostInput) (*model.Post, error)
 	Update(id string, input PostInput) (*model.Post, error)
 	Delete(id string) error
@@ -61,6 +66,39 @@ func (s *postService) List() ([]model.Post, error) {
 	return s.postRepo.List()
 }
 
+func (s *postService) ListPublished(page string, limit string) ([]model.Post, error) {
+	parsedPage, parsedLimit := normalizePagination(page, limit)
+	return s.postRepo.ListPublished(parsedPage, parsedLimit)
+}
+
+func (s *postService) ListPublishedByCategory(categoryID string, page string, limit string) ([]model.Post, error) {
+	parsedCategoryID, err := uuid.Parse(strings.TrimSpace(categoryID))
+	if err != nil {
+		return nil, ErrPostCategoryNotFound
+	}
+
+	category, err := s.categoryRepo.FindByID(parsedCategoryID)
+	if err != nil {
+		return nil, err
+	}
+	if category == nil {
+		return nil, ErrPostCategoryNotFound
+	}
+
+	parsedPage, parsedLimit := normalizePagination(page, limit)
+	return s.postRepo.ListPublishedByCategory(parsedCategoryID, parsedPage, parsedLimit)
+}
+
+func (s *postService) SearchPublished(query string, page string, limit string) ([]model.Post, error) {
+	normalizedQuery := strings.TrimSpace(query)
+	if normalizedQuery == "" {
+		return []model.Post{}, nil
+	}
+
+	parsedPage, parsedLimit := normalizePagination(page, limit)
+	return s.postRepo.SearchPublished(normalizedQuery, parsedPage, parsedLimit)
+}
+
 func (s *postService) GetByID(id string) (*model.Post, error) {
 	parsedID, err := uuid.Parse(id)
 	if err != nil {
@@ -68,6 +106,23 @@ func (s *postService) GetByID(id string) (*model.Post, error) {
 	}
 
 	post, err := s.postRepo.FindByID(parsedID)
+	if err != nil {
+		return nil, err
+	}
+	if post == nil {
+		return nil, ErrPostNotFound
+	}
+
+	return post, nil
+}
+
+func (s *postService) GetPublishedByID(id string) (*model.Post, error) {
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, ErrPostNotFound
+	}
+
+	post, err := s.postRepo.FindPublishedByID(parsedID)
 	if err != nil {
 		return nil, err
 	}
@@ -226,4 +281,21 @@ func (s *postService) resolveTags(tagIDs []string) ([]model.Tag, error) {
 	}
 
 	return tags, nil
+}
+
+func normalizePagination(page string, limit string) (int, int) {
+	parsedPage, err := strconv.Atoi(strings.TrimSpace(page))
+	if err != nil || parsedPage < 1 {
+		parsedPage = 1
+	}
+
+	parsedLimit, err := strconv.Atoi(strings.TrimSpace(limit))
+	if err != nil || parsedLimit < 1 {
+		parsedLimit = 9
+	}
+	if parsedLimit > 50 {
+		parsedLimit = 50
+	}
+
+	return parsedPage, parsedLimit
 }

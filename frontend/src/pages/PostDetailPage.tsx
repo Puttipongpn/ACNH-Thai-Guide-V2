@@ -90,6 +90,10 @@ export default function PostDetailPage() {
                       <Chip key={tag.id} label={tag.name} variant="outlined" />
                     ))}
                   </Stack>
+                  <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+                    Created {new Date(post.created_at).toLocaleDateString()} · Updated{' '}
+                    {new Date(post.updated_at).toLocaleDateString()}
+                  </Typography>
                   <Typography variant="h1" sx={{ fontSize: { xs: 34, md: 48 } }}>
                     {post.title}
                   </Typography>

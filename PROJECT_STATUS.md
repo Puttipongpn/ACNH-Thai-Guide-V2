@@ -1,7 +1,7 @@
 # Current Status
 
 Project Stage:
-Foundation + Authentication + Category + Tag + Post + Content Builder Management
+Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website
 
 Completed:
 - Docker Compose foundation
@@ -108,11 +108,26 @@ Completed:
 - Content block validation checks: unsupported block type returns 400 and missing text content returns 400
 - Public post detail route verification returned HTTP 200
 - Complete content builder re-verification passed: create TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, HIGHLIGHT_BLOCK; update each block type; delete a block; reorder blocks; get blocks by post; unauthorized create/update/delete/reorder 401; public post detail route 200
+- Public Home page with cozy hero, search bar, category cards, and latest published posts
+- Public Category page at /categories/:id with category detail, tags, and published posts
+- Public Search Results page at /search?q=
+- Public Post Detail page shows title, description, category, tags, Facebook source URL, created date, updated date, and content blocks
+- Public category read APIs at GET /api/v1/categories and GET /api/v1/categories/:id
+- Public category posts API at GET /api/v1/categories/:category_id/posts
+- Public search API at GET /api/v1/search?q=
+- Public post list/detail APIs now return only published posts
+- Protected admin post list API at GET /api/v1/admin/posts keeps draft visibility for admin pages
+- Pagination query support for public post list, category posts, and search using page and limit
+- Public search supports title, description, category name, and tag name
+- Docker Compose rebuild verification after public website changes
+- Public website verification passed: home route 200, category route 200, post detail route 200, search route 200
+- Public API verification passed: published posts visible, draft posts hidden, admin posts include drafts, category posts filter published only, search finds by description/tag/category
+- Public post detail content block API verification passed with TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, and HIGHLIGHT_BLOCK
 
 Next Task:
 - Add media file model and management
-- Add public post listing UI
 - Improve public guide discovery and filtering
+- Add richer pagination metadata for public lists
 
 Notes:
 - Docker Compose stack is currently running in detached mode.
@@ -131,8 +146,11 @@ Notes:
 - Verified content block read endpoint is public and content block write/reorder endpoints require admin JWT authentication.
 - Latest content builder verification found no CRUD, validation, relation, TypeScript, Go compilation, Docker, or authorization issues.
 - Latest focused content builder verification kept all four render block types after delete test and found no CRUD, reorder, read, route, or authorization issues.
+- Verified public pages use published-only APIs while admin post management still sees draft posts.
+- Latest public website verification found no routing, search, TypeScript, Go compilation, Docker, or published/draft filtering issues.
 - Browser automation was unavailable in this session, but frontend route /admin/categories returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but frontend route /posts/:id returned HTTP 200 and frontend production build passed.
+- Browser automation was unavailable in this session, but public home, category, post detail, and search routes returned HTTP 200 and frontend production build passed.
 
 Definition of Done:
 docker compose up works

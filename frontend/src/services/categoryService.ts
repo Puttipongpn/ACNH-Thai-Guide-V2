@@ -8,10 +8,13 @@ function authHeaders() {
 }
 
 export async function listCategories(): Promise<ApiResponse<Category[]>> {
-  const response = await api.get<ApiResponse<Category[]>>('/categories', {
-    headers: authHeaders(),
-  });
+  const response = await api.get<ApiResponse<Category[]>>('/categories');
 
+  return response.data;
+}
+
+export async function getCategory(id: string): Promise<ApiResponse<Category>> {
+  const response = await api.get<ApiResponse<Category>>(`/categories/${id}`);
   return response.data;
 }
 

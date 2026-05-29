@@ -38,7 +38,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import ContentBlockBuilder from '../components/ContentBlockBuilder';
 import { clearAuthToken, getAuthToken } from '../services/authService';
 import { listCategories } from '../services/categoryService';
-import { createPost, deletePost, listPosts, updatePost } from '../services/postService';
+import { createPost, deletePost, listAdminPosts, updatePost } from '../services/postService';
 import { listTags } from '../services/tagService';
 import type { Category, Post, PostInput, PostStatus, Tag } from '../types/api';
 
@@ -85,7 +85,7 @@ export default function AdminPostsPage() {
 
     try {
       const [postResponse, categoryResponse, tagResponse] = await Promise.all([
-        listPosts(),
+        listAdminPosts(),
         listCategories(),
         listTags(),
       ]);

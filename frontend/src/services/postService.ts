@@ -7,13 +7,43 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-export async function listPosts(): Promise<ApiResponse<Post[]>> {
-  const response = await api.get<ApiResponse<Post[]>>('/posts');
+export type PostListParams = {
+  page?: number;
+  limit?: number;
+};
+
+export type SearchPostsParams = PostListParams & {
+  q: string;
+};
+
+export async function listPosts(params?: PostListParams): Promise<ApiResponse<Post[]>> {
+  const response = await api.get<ApiResponse<Post[]>>('/posts', { params });
+  return response.data;
+}
+
+export async function listAdminPosts(): Promise<ApiResponse<Post[]>> {
+  const response = await api.get<ApiResponse<Post[]>>('/admin/posts', {
+    headers: authHeaders(),
+  });
+
   return response.data;
 }
 
 export async function getPost(id: string): Promise<ApiResponse<Post>> {
   const response = await api.get<ApiResponse<Post>>(`/posts/${id}`);
+  return response.data;
+}
+
+export async function listPostsByCategory(
+  categoryId: string,
+  params?: PostListParams,
+): Promise<ApiResponse<Post[]>> {
+  const response = await api.get<ApiResponse<Post[]>>(`/categories/${categoryId}/posts`, { params });
+  return response.data;
+}
+
+export async function searchPosts(params: SearchPostsParams): Promise<ApiResponse<Post[]>> {
+  const response = await api.get<ApiResponse<Post[]>>('/search', { params });
   return response.data;
 }
 
