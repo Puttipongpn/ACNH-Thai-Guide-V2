@@ -29,6 +29,11 @@ function youtubeEmbedUrl(url: string) {
   return '';
 }
 
+function isDirectVideoUrl(url: string) {
+  const normalizedUrl = url.toLowerCase().split('?')[0];
+  return normalizedUrl.endsWith('.mp4') || normalizedUrl.endsWith('.webm') || normalizedUrl.endsWith('.ogg');
+}
+
 export default function ContentBlockRenderer({ block }: Props) {
   if (block.type === 'TEXT_BLOCK') {
     const size = block.metadata.size ?? 'medium';
@@ -114,6 +119,18 @@ export default function ContentBlockRenderer({ block }: Props) {
             }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+          />
+        ) : isDirectVideoUrl(videoUrl) ? (
+          <Box
+            component="video"
+            src={videoUrl}
+            controls
+            sx={{
+              width: '100%',
+              borderRadius: 2,
+              border: '1px solid rgba(111, 102, 85, 0.14)',
+              boxShadow: '0 12px 28px rgba(154, 197, 216, 0.22)',
+            }}
           />
         ) : (
           <Button

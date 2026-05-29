@@ -43,6 +43,7 @@ import type {
   ContentTextSize,
 } from '../types/api';
 import ContentBlockRenderer from './ContentBlockRenderer';
+import MediaPicker from './MediaPicker';
 
 type Props = {
   postId: string;
@@ -390,6 +391,16 @@ export default function ContentBlockBuilder({ postId }: Props) {
 
               {form.type === 'IMAGE_BLOCK' && (
                 <>
+                  <MediaPicker
+                    kind="image"
+                    selectedUrl={form.metadata.image_url}
+                    onSelect={(media) => {
+                      updateMetadata('image_url', media.file_url);
+                      if (!form.metadata.alt_text) {
+                        updateMetadata('alt_text', media.original_name);
+                      }
+                    }}
+                  />
                   <TextField
                     label="Image URL"
                     value={form.metadata.image_url ?? ''}
@@ -435,6 +446,16 @@ export default function ContentBlockBuilder({ postId }: Props) {
 
               {form.type === 'VIDEO_BLOCK' && (
                 <>
+                  <MediaPicker
+                    kind="video"
+                    selectedUrl={form.metadata.url}
+                    onSelect={(media) => {
+                      updateMetadata('url', media.file_url);
+                      if (!form.metadata.title) {
+                        updateMetadata('title', media.original_name);
+                      }
+                    }}
+                  />
                   <TextField
                     label="Video title"
                     value={form.metadata.title ?? ''}

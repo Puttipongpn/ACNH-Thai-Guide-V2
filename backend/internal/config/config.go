@@ -20,6 +20,9 @@ type Config struct {
 	JWTExpiresHours    int
 	AdminEmail         string
 	AdminPassword      string
+	UploadDir          string
+	PublicBaseURL      string
+	MaxUploadSizeMB    int
 }
 
 func Load() Config {
@@ -37,6 +40,9 @@ func Load() Config {
 		JWTExpiresHours:    getEnvAsInt("JWT_EXPIRES_HOURS", 24),
 		AdminEmail:         getEnv("ADMIN_EMAIL", "admin@example.com"),
 		AdminPassword:      getEnv("ADMIN_PASSWORD", "admin12345"),
+		UploadDir:          getEnv("UPLOAD_DIR", "uploads"),
+		PublicBaseURL:      getEnv("PUBLIC_BASE_URL", "http://localhost:8080"),
+		MaxUploadSizeMB:    getEnvAsInt("MAX_UPLOAD_SIZE_MB", 50),
 	}
 }
 

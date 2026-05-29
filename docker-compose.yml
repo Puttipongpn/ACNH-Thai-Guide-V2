@@ -34,8 +34,13 @@ services:
       JWT_EXPIRES_HOURS: ${JWT_EXPIRES_HOURS:-24}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
+      UPLOAD_DIR: /app/uploads
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
+      MAX_UPLOAD_SIZE_MB: ${MAX_UPLOAD_SIZE_MB:-50}
     ports:
       - "${SERVER_PORT:-8080}:8080"
+    volumes:
+      - backend_uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,3 +58,4 @@ services:
 
 volumes:
   postgres_data:
+  backend_uploads:

@@ -17,6 +17,7 @@ func Register(
 	tagHandler *handler.TagHandler,
 	postHandler *handler.PostHandler,
 	contentBlockHandler *handler.ContentBlockHandler,
+	mediaHandler *handler.MediaHandler,
 ) {
 	api := e.Group("/api/v1")
 	api.GET("/health", healthHandler.Check)
@@ -46,4 +47,7 @@ func Register(
 	protected.PUT("/content-blocks/:id", contentBlockHandler.Update)
 	protected.DELETE("/content-blocks/:id", contentBlockHandler.Delete)
 	protected.PUT("/posts/:post_id/content-blocks/reorder", contentBlockHandler.Reorder)
+	protected.POST("/admin/media/upload", mediaHandler.Upload)
+	protected.GET("/admin/media", mediaHandler.List)
+	protected.DELETE("/admin/media/:id", mediaHandler.Delete)
 }

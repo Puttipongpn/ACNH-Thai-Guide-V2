@@ -30,6 +30,9 @@ func main() {
 	if err := authService.EnsureAdminUser(cfg.AdminEmail, cfg.AdminPassword); err != nil {
 		log.Fatalf("failed to ensure admin user: %v", err)
 	}
+	if err := database.SeedDevelopmentData(db, cfg.AppEnv); err != nil {
+		log.Fatalf("failed to seed development data: %v", err)
+	}
 	categoryRepository := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepository)
 	tagRepository := repository.NewTagRepository(db)
@@ -38,9 +41,12 @@ func main() {
 	postService := service.NewPostService(postRepository, categoryRepository, tagRepository)
 	contentBlockRepository := repository.NewContentBlockRepository(db)
 	contentBlockService := service.NewContentBlockService(contentBlockRepository, postRepository)
+	mediaRepository := repository.NewMediaRepository(db)
+	mediaService := service.NewMediaService(cfg, mediaRepository)
 
 	e := echo.New()
 	e.HideBanner = true
+	e.Static("/uploads", cfg.UploadDir)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -55,7 +61,8 @@ func main() {
 	tagHandler := handler.NewTagHandler(tagService)
 	postHandler := handler.NewPostHandler(postService)
 	contentBlockHandler := handler.NewContentBlockHandler(contentBlockService)
-	route.Register(e, cfg, healthHandler, authHandler, categoryHandler, tagHandler, postHandler, contentBlockHandler)
+	mediaHandler := handler.NewMediaHandler(mediaService)
+	route.Register(e, cfg, healthHandler, authHandler, categoryHandler, tagHandler, postHandler, contentBlockHandler, mediaHandler)
 
 	e.Logger.Fatal(e.Start(":" + cfg.ServerPort))
 }

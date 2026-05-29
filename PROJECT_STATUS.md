@@ -1,7 +1,7 @@
 # Current Status
 
 Project Stage:
-Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish
+Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish + Media Upload + Development Seed Data
 
 Completed:
 - Docker Compose foundation
@@ -135,9 +135,35 @@ Completed:
 - Content Builder controls and block cards improved for mobile wrapping and spacing
 - UI polish frontend build verification passed
 - UI polish route verification passed for home, login, admin categories, admin tags, admin posts, category detail, post detail, and search
+- MediaFile model with UUID primary key
+- Automatic media_files table migration
+- Local upload storage configured at backend/uploads for local development and /app/uploads in Docker
+- Uploaded files served publicly from /uploads
+- Docker Compose backend_uploads volume added for persistent uploaded files
+- Protected media upload API at POST /api/v1/admin/media/upload
+- Protected media list API at GET /api/v1/admin/media
+- Protected media delete API at DELETE /api/v1/admin/media/:id
+- Media upload validation supports image and video files
+- Media upload validation rejects unsupported file types
+- Media upload max size is configurable with MAX_UPLOAD_SIZE_MB
+- Admin media picker/upload UI added inside IMAGE_BLOCK and VIDEO_BLOCK forms
+- IMAGE_BLOCK can select uploaded images from the media library
+- VIDEO_BLOCK can select uploaded videos or use a video URL
+- Media upload progress and preview are shown in the admin media picker
+- Public content renderer supports direct uploaded video files
+- Media upload verification passed: unauthorized upload 401, unsupported file rejected, image upload, video upload, public /uploads serving, media list, media delete
+- Uploaded image content block verification passed and public post detail route returned HTTP 200
+- Automatic development seed data added for categories, tags, posts, post tag relations, and content blocks
+- Development seed runs on backend startup only when APP_ENV=development
+- Seed data is idempotent and checks existing slugs/content blocks before inserting
+- Seeded categories include Thai and English guide sections for rules, beginner guide, tips, updates, items, villagers, fish/bugs/diving, island design, and FAQ
+- Seeded tags include beginner, tips, island, event, item, villager, design, and faq
+- Seeded posts include 6 published cozy guide posts and 2 draft posts
+- Seeded published posts include TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, and HIGHLIGHT_BLOCK examples
+- Seed verification passed: public home/latest posts show seeded published posts, category pages show seeded posts, post detail renders seeded content blocks, draft posts stay hidden from public pages
+- Seed idempotency verification passed after backend restart with no duplicate categories, tags, posts, or content blocks
 
 Next Task:
-- Add media file model and management
 - Improve public guide discovery and filtering
 - Add richer pagination metadata for public lists
 
@@ -161,6 +187,8 @@ Notes:
 - Verified public pages use published-only APIs while admin post management still sees draft posts.
 - Latest public website verification found no routing, search, TypeScript, Go compilation, Docker, or published/draft filtering issues.
 - Latest UI polish verification found no TypeScript build issues or major route regressions.
+- Latest media upload verification found no upload, storage, public serving, image block, TypeScript, Go compilation, Docker volume, or delete issues.
+- Latest seed data verification found no startup, idempotency, public visibility, draft filtering, content block rendering, TypeScript, or Go compilation issues.
 - Browser automation was unavailable in this session, but frontend route /admin/categories returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but frontend route /posts/:id returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but public home, category, post detail, and search routes returned HTTP 200 and frontend production build passed.

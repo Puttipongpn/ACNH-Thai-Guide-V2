@@ -115,3 +115,15 @@ export type ContentBlockInput = {
   content: string;
   metadata: ContentBlockMetadata;
 };
+
+export type MediaFile = {
+  id: string;
+  original_name: string;
+  file_name: string;
+  file_path: string;
+  file_url: string;
+  mime_type: string;
+  size: number;
+  created_at: string;
+  updated_at: string;
+};
