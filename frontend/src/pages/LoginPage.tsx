@@ -11,13 +11,14 @@ import {
 } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { loginAdmin, saveAuthToken } from '../services/authService';
 import type { AdminUser } from '../types/api';
 
 type LoginState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('admin12345');
   const [loginState, setLoginState] = useState<LoginState>('idle');
@@ -35,6 +36,7 @@ export default function LoginPage() {
       setUser(response.data.user);
       setLoginState('success');
       setMessage('Login successful. Admin token saved for this browser.');
+      navigate('/admin/categories');
     } catch {
       setLoginState('error');
       setMessage('Login failed. Please check the admin email and password.');

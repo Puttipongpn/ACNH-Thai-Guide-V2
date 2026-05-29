@@ -30,6 +30,8 @@ func main() {
 	if err := authService.EnsureAdminUser(cfg.AdminEmail, cfg.AdminPassword); err != nil {
 		log.Fatalf("failed to ensure admin user: %v", err)
 	}
+	categoryRepository := repository.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepository)
 
 	e := echo.New()
 	e.HideBanner = true
@@ -43,7 +45,8 @@ func main() {
 
 	healthHandler := handler.NewHealthHandler(db)
 	authHandler := handler.NewAuthHandler(authService)
-	route.Register(e, healthHandler, authHandler)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+	route.Register(e, cfg, healthHandler, authHandler, categoryHandler)
 
 	e.Logger.Fatal(e.Start(":" + cfg.ServerPort))
 }
