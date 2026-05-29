@@ -4,7 +4,9 @@ import (
 	"acnh-thailand/backend/internal/config"
 	"acnh-thailand/backend/internal/database"
 	"acnh-thailand/backend/internal/handler"
+	"acnh-thailand/backend/internal/repository"
 	"acnh-thailand/backend/internal/route"
+	"acnh-thailand/backend/internal/service"
 	"log"
 	"strings"
 
@@ -19,6 +21,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
+	if err := database.AutoMigrate(db); err != nil {
+		log.Fatalf("failed to run database migrations: %v", err)
+	}
+
+	userRepository := repository.NewUserRepository(db)
+	authService := service.NewAuthService(cfg, userRepository)
+	if err := authService.EnsureAdminUser(cfg.AdminEmail, cfg.AdminPassword); err != nil {
+		log.Fatalf("failed to ensure admin user: %v", err)
+	}
 
 	e := echo.New()
 	e.HideBanner = true
@@ -31,7 +42,8 @@ func main() {
 	}))
 
 	healthHandler := handler.NewHealthHandler(db)
-	route.Register(e, healthHandler)
+	authHandler := handler.NewAuthHandler(authService)
+	route.Register(e, healthHandler, authHandler)
 
 	e.Logger.Fatal(e.Start(":" + cfg.ServerPort))
 }

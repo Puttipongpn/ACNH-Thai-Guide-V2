@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -15,6 +16,10 @@ type Config struct {
 	DBName             string
 	DBSSLMode          string
 	CORSAllowedOrigins string
+	JWTSecret          string
+	JWTExpiresHours    int
+	AdminEmail         string
+	AdminPassword      string
 }
 
 func Load() Config {
@@ -28,6 +33,10 @@ func Load() Config {
 		DBName:             getEnv("DB_NAME", "acnh_community"),
 		DBSSLMode:          getEnv("DB_SSLMODE", "disable"),
 		CORSAllowedOrigins: getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:5173"),
+		JWTSecret:          getEnv("JWT_SECRET", "change_me_to_a_long_random_secret"),
+		JWTExpiresHours:    getEnvAsInt("JWT_EXPIRES_HOURS", 24),
+		AdminEmail:         getEnv("ADMIN_EMAIL", "admin@example.com"),
+		AdminPassword:      getEnv("ADMIN_PASSWORD", "admin12345"),
 	}
 }
 
@@ -50,4 +59,18 @@ func getEnv(key string, fallback string) string {
 	}
 
 	return value
+}
+
+func getEnvAsInt(key string, fallback int) int {
+	value := os.Getenv(key)
+	if value == "" {
+		return fallback
+	}
+
+	parsed, err := strconv.Atoi(value)
+	if err != nil {
+		return fallback
+	}
+
+	return parsed
 }

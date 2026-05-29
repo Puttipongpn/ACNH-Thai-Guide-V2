@@ -12,6 +12,7 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import SearchIcon from '@mui/icons-material/Search';
+import { Link as RouterLink } from 'react-router-dom';
 import { getHealthStatus } from '../services/healthService';
 import type { HealthStatus } from '../types/api';
 
@@ -132,7 +133,7 @@ export default function App() {
                 <Button variant="contained" startIcon={<SearchIcon />}>
                   Browse guides
                 </Button>
-                <Button variant="outlined" startIcon={<FavoriteIcon />}>
+                <Button component={RouterLink} to="/login" variant="outlined" startIcon={<FavoriteIcon />}>
                   Admin login
                 </Button>
               </Stack>
