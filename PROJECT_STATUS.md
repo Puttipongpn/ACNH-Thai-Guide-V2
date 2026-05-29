@@ -176,10 +176,18 @@ Completed:
 - Final QA verified media upload, public media serving, media persistence after backend restart, and media deletion
 - Final QA verified seed data remains idempotent after backend restart
 - README updated with current Docker, admin, seed data, uploads, and useful API information
+- Facebook raw data import analysis completed without importing into the database
+- Raw Facebook export folder inspected at /Users/panupong.ma/Documents/Codex/2026-05-28/facebook-group-private-animal-crossing-new
+- Created docs/facebook-import-analysis.md with file inventory, usable sources, ignored files, duplicate groups, candidate matrix, review risks, and next-step recommendations
+- Created data/facebook-import-candidates.json with 15 de-duplicated curated import candidates
+- Facebook import candidate summary: 6 high-confidence drafts, 9 review-needed candidates, 15 candidates with image references, 50 referenced local images
+- Raw Facebook files were not modified, deleted, or overwritten
+- No uploaded media was copied and no app data was changed during the import analysis step
 
 Next Task:
-- Improve public guide discovery and filtering
-- Add richer pagination metadata for public lists
+- Review Facebook import candidates manually
+- Build a separate idempotent import command after approval
+- Copy approved images into backend/uploads/imported-facebook during the future import step
 
 Notes:
 - Docker Compose stack is currently running in detached mode.
@@ -207,6 +215,10 @@ Notes:
 - Browser automation was unavailable in this session, but frontend route /admin/categories returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but frontend route /posts/:id returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but public home, category, post detail, and search routes returned HTTP 200 and frontend production build passed.
+- Latest Facebook import analysis found 93 raw files: 5 JSON, 3 Markdown, 83 images, and 2 .DS_Store files.
+- Recommended import source is acnh_curated_post_images.json supported by acnh_curated_image_assets.json and curated_post_images/.
+- acnh_raw_extraction.json is retained as trace evidence but should not be imported directly because it is large, noisy, and duplicated.
+- ocr_image_assets should be treated as review/reference material because several .png files appear to be derived assets with mismatched image encoding.
 
 Definition of Done:
 docker compose up works
