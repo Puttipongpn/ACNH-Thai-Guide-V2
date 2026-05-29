@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   Container,
   Dialog,
   DialogActions,
@@ -173,7 +174,7 @@ export default function AdminTagsPage() {
               </Typography>
             </Box>
 
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Button component={RouterLink} to="/admin/categories" variant="outlined" startIcon={<CategoryIcon />}>
                 Categories
               </Button>
@@ -198,6 +199,7 @@ export default function AdminTagsPage() {
             sx={{
               border: '1px solid rgba(111, 102, 85, 0.16)',
               boxShadow: '0 18px 42px rgba(127, 183, 126, 0.18)',
+              display: { xs: 'none', md: 'block' },
             }}
           >
             <Table>
@@ -238,6 +240,46 @@ export default function AdminTagsPage() {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <Stack spacing={1.5} sx={{ display: { xs: 'flex', md: 'none' } }}>
+            {loading && <Alert severity="info">Loading tags...</Alert>}
+            {!loading && tags.length === 0 && <Alert severity="info">No tags yet.</Alert>}
+            {tags.map((tag) => (
+              <Paper
+                key={tag.id}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  border: '1px solid rgba(111, 102, 85, 0.14)',
+                  bgcolor: '#fffdf4',
+                  boxShadow: '0 12px 28px rgba(127, 183, 126, 0.14)',
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Stack direction="row" justifyContent="space-between" spacing={1}>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography sx={{ fontWeight: 800 }}>{tag.name}</Typography>
+                      <Typography sx={{ color: 'text.secondary', fontSize: 13, overflowWrap: 'anywhere' }}>
+                        {tag.slug}
+                      </Typography>
+                    </Box>
+                    <Chip label="Tag" size="small" color="secondary" />
+                  </Stack>
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
+                    {tag.description || 'No description yet.'}
+                  </Typography>
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <IconButton aria-label={`Edit ${tag.name}`} onClick={() => openEditModal(tag)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton aria-label={`Delete ${tag.name}`} onClick={() => void handleDelete(tag)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
         </Stack>
       </Container>
 
@@ -270,7 +312,7 @@ export default function AdminTagsPage() {
               />
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>
             <Button onClick={closeModal}>Cancel</Button>
             <Button type="submit" variant="contained" disabled={saving}>
               {saving ? 'Saving...' : 'Save'}

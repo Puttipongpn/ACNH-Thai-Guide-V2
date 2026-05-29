@@ -81,26 +81,24 @@ export default function SearchResultsPage() {
                 Search Guides
               </Typography>
               <Box component="form" onSubmit={handleSearch}>
-                <TextField
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search by title, description, tag, or category"
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Button type="submit" variant="contained">
-                          Search
-                        </Button>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
+                  <TextField
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search by title, description, tag, or category"
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Button type="submit" variant="contained" startIcon={<SearchIcon />} sx={{ px: 3 }}>
+                    Search
+                  </Button>
+                </Stack>
               </Box>
               {activeQuery && (
                 <Typography sx={{ color: 'text.secondary' }}>

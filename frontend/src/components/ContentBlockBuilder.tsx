@@ -283,14 +283,20 @@ export default function ContentBlockBuilder({ postId }: Props) {
                 p: 2,
                 border: '1px solid rgba(111, 102, 85, 0.14)',
                 bgcolor: '#fff8e8',
+                overflow: 'hidden',
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1}
+                  alignItems={{ xs: 'stretch', sm: 'center' }}
+                  justifyContent="space-between"
+                >
                   <Typography sx={{ fontWeight: 800 }}>
                     {index + 1}. {blockLabels[block.type]}
                   </Typography>
-                  <Stack direction="row" spacing={0.5}>
+                  <Stack direction="row" spacing={0.5} justifyContent={{ xs: 'flex-end', sm: 'flex-start' }}>
                     <Tooltip title="Move up">
                       <span>
                         <IconButton size="small" disabled={index === 0} onClick={() => void moveBlock(index, -1)}>
@@ -331,7 +337,7 @@ export default function ContentBlockBuilder({ postId }: Props) {
       <Dialog open={modalOpen} onClose={closeModal} fullWidth maxWidth="md">
         <Box component="form" onSubmit={handleSubmit}>
           <DialogTitle>{modalTitle}</DialogTitle>
-          <DialogContent>
+          <DialogContent sx={{ px: { xs: 2, md: 3 } }}>
             <Stack spacing={2} sx={{ pt: 1 }}>
               {!editingBlock && (
                 <ToggleButtonGroup
@@ -340,7 +346,12 @@ export default function ContentBlockBuilder({ postId }: Props) {
                   onChange={(_, value: ContentBlockType | null) => {
                     if (value) setForm(inputForType(value, blocks.length));
                   }}
-                  sx={{ flexWrap: 'wrap' }}
+                  sx={{
+                    flexWrap: 'wrap',
+                    '& .MuiToggleButton-root': {
+                      flex: { xs: '1 1 45%', sm: '0 0 auto' },
+                    },
+                  }}
                 >
                   <ToggleButton value="TEXT_BLOCK">Text</ToggleButton>
                   <ToggleButton value="IMAGE_BLOCK">Image</ToggleButton>
@@ -450,7 +461,7 @@ export default function ContentBlockBuilder({ postId }: Props) {
               )}
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>
             <Button onClick={closeModal}>Cancel</Button>
             <Button type="submit" variant="contained" disabled={saving}>
               {saving ? 'Saving...' : 'Save'}

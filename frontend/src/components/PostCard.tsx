@@ -15,6 +15,11 @@ export default function PostCard({ post }: Props) {
         border: '1px solid rgba(111, 102, 85, 0.14)',
         boxShadow: '0 16px 34px rgba(127, 183, 126, 0.16)',
         bgcolor: '#fffdf4',
+        transition: 'transform 160ms ease, box-shadow 160ms ease',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: '0 18px 38px rgba(127, 183, 126, 0.22)',
+        },
       }}
     >
       <CardActionArea component={RouterLink} to={`/posts/${post.id}`} sx={{ height: '100%' }}>

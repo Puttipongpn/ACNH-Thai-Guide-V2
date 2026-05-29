@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   Container,
   Dialog,
   DialogActions,
@@ -180,7 +181,7 @@ export default function AdminCategoriesPage() {
               </Typography>
             </Box>
 
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Button component={RouterLink} to="/" variant="outlined">
                 Home
               </Button>
@@ -208,6 +209,7 @@ export default function AdminCategoriesPage() {
             sx={{
               border: '1px solid rgba(111, 102, 85, 0.16)',
               boxShadow: '0 18px 42px rgba(127, 183, 126, 0.18)',
+              display: { xs: 'none', md: 'block' },
             }}
           >
             <Table>
@@ -250,10 +252,50 @@ export default function AdminCategoriesPage() {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <Stack spacing={1.5} sx={{ display: { xs: 'flex', md: 'none' } }}>
+            {loading && <Alert severity="info">Loading categories...</Alert>}
+            {!loading && categories.length === 0 && <Alert severity="info">No categories yet.</Alert>}
+            {categories.map((category) => (
+              <Paper
+                key={category.id}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  border: '1px solid rgba(111, 102, 85, 0.14)',
+                  bgcolor: '#fffdf4',
+                  boxShadow: '0 12px 28px rgba(127, 183, 126, 0.14)',
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Stack direction="row" justifyContent="space-between" spacing={1}>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography sx={{ fontWeight: 800 }}>{category.name}</Typography>
+                      <Typography sx={{ color: 'text.secondary', fontSize: 13, overflowWrap: 'anywhere' }}>
+                        {category.slug}
+                      </Typography>
+                    </Box>
+                    <Chip label={`#${category.display_order}`} size="small" variant="outlined" />
+                  </Stack>
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
+                    {category.description || 'No description yet.'}
+                  </Typography>
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <IconButton aria-label={`Edit ${category.name}`} onClick={() => openEditModal(category)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton aria-label={`Delete ${category.name}`} onClick={() => void handleDelete(category)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
         </Stack>
       </Container>
 
-      <Dialog open={modalOpen} onClose={closeModal} fullWidth maxWidth="sm">
+      <Dialog open={modalOpen} onClose={closeModal} fullWidth maxWidth="sm" fullScreen={false}>
         <Box component="form" onSubmit={handleSubmit}>
           <DialogTitle>{modalTitle}</DialogTitle>
           <DialogContent>
@@ -294,7 +336,7 @@ export default function AdminCategoriesPage() {
               />
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>
             <Button onClick={closeModal}>Cancel</Button>
             <Button type="submit" variant="contained" disabled={saving}>
               {saving ? 'Saving...' : 'Save'}

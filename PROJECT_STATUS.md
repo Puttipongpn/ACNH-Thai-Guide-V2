@@ -1,7 +1,7 @@
 # Current Status
 
 Project Stage:
-Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website
+Foundation + Authentication + Category + Tag + Post + Content Builder + Public Website + UI Polish
 
 Completed:
 - Docker Compose foundation
@@ -123,6 +123,18 @@ Completed:
 - Public website verification passed: home route 200, category route 200, post detail route 200, search route 200
 - Public API verification passed: published posts visible, draft posts hidden, admin posts include drafts, category posts filter published only, search finds by description/tag/category
 - Public post detail content block API verification passed with TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, and HIGHLIGHT_BLOCK
+- Global Material UI theme polish for warmer colors, softer buttons, chips, alerts, cards, and inputs
+- Empty states improved with cozy card styling
+- Post cards improved with softer borders, shadows, spacing, and hover states
+- Public Home search layout improved for mobile
+- Search results form layout improved for mobile
+- Login page polished with softer admin panel styling
+- Admin Categories page now uses responsive mobile cards below desktop table breakpoint
+- Admin Tags page now uses responsive mobile cards below desktop table breakpoint
+- Admin Posts page now uses responsive mobile/tablet cards below desktop table breakpoint
+- Content Builder controls and block cards improved for mobile wrapping and spacing
+- UI polish frontend build verification passed
+- UI polish route verification passed for home, login, admin categories, admin tags, admin posts, category detail, post detail, and search
 
 Next Task:
 - Add media file model and management
@@ -148,6 +160,7 @@ Notes:
 - Latest focused content builder verification kept all four render block types after delete test and found no CRUD, reorder, read, route, or authorization issues.
 - Verified public pages use published-only APIs while admin post management still sees draft posts.
 - Latest public website verification found no routing, search, TypeScript, Go compilation, Docker, or published/draft filtering issues.
+- Latest UI polish verification found no TypeScript build issues or major route regressions.
 - Browser automation was unavailable in this session, but frontend route /admin/categories returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but frontend route /posts/:id returned HTTP 200 and frontend production build passed.
 - Browser automation was unavailable in this session, but public home, category, post detail, and search routes returned HTTP 200 and frontend production build passed.

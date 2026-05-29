@@ -54,7 +54,7 @@ export default function LoginPage() {
     >
       <Container maxWidth="sm">
         <Stack spacing={3}>
-          <Button component={RouterLink} to="/" variant="text" startIcon={<LocalFloristIcon />} sx={{ alignSelf: 'flex-start' }}>
+          <Button component={RouterLink} to="/" variant="outlined" startIcon={<LocalFloristIcon />} sx={{ alignSelf: 'flex-start' }}>
             Back to island
           </Button>
 
@@ -64,6 +64,7 @@ export default function LoginPage() {
               border: '1px solid rgba(111, 102, 85, 0.16)',
               boxShadow: '0 18px 42px rgba(127, 183, 126, 0.22)',
               p: { xs: 3, md: 4 },
+              bgcolor: 'rgba(255, 253, 244, 0.92)',
             }}
           >
             <Stack component="form" spacing={3} onSubmit={handleSubmit}>

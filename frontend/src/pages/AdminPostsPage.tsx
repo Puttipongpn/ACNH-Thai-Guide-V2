@@ -210,7 +210,7 @@ export default function AdminPostsPage() {
               </Typography>
             </Box>
 
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Button component={RouterLink} to="/admin/categories" variant="outlined" startIcon={<CategoryIcon />}>
                 Categories
               </Button>
@@ -235,6 +235,7 @@ export default function AdminPostsPage() {
             sx={{
               border: '1px solid rgba(111, 102, 85, 0.16)',
               boxShadow: '0 18px 42px rgba(127, 183, 126, 0.18)',
+              display: { xs: 'none', lg: 'block' },
             }}
           >
             <Table>
@@ -284,13 +285,59 @@ export default function AdminPostsPage() {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <Stack spacing={1.5} sx={{ display: { xs: 'flex', lg: 'none' } }}>
+            {loading && <Alert severity="info">Loading posts...</Alert>}
+            {!loading && posts.length === 0 && <Alert severity="info">No posts yet.</Alert>}
+            {posts.map((post) => (
+              <Paper
+                key={post.id}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  border: '1px solid rgba(111, 102, 85, 0.14)',
+                  bgcolor: '#fffdf4',
+                  boxShadow: '0 12px 28px rgba(127, 183, 126, 0.14)',
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Stack direction="row" justifyContent="space-between" spacing={1} alignItems="flex-start">
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography sx={{ fontWeight: 800, lineHeight: 1.3 }}>{post.title}</Typography>
+                      <Typography sx={{ color: 'text.secondary', fontSize: 13, overflowWrap: 'anywhere' }}>
+                        {post.slug}
+                      </Typography>
+                    </Box>
+                    <Chip label={post.status} size="small" color={post.status === 'published' ? 'primary' : 'default'} />
+                  </Stack>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    <Chip label={post.category?.name ?? 'No category'} size="small" variant="outlined" />
+                    {post.tags.map((tag) => (
+                      <Chip key={tag.id} label={tag.name} size="small" variant="outlined" />
+                    ))}
+                  </Stack>
+                  <Typography sx={{ color: 'text.secondary', fontSize: 14, overflowWrap: 'anywhere' }}>
+                    {post.source_url || 'No source URL'}
+                  </Typography>
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <IconButton aria-label={`Edit ${post.title}`} onClick={() => openEditModal(post)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton aria-label={`Delete ${post.title}`} onClick={() => void handleDelete(post)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
         </Stack>
       </Container>
 
       <Dialog open={modalOpen} onClose={closeModal} fullWidth maxWidth="lg">
         <Box component="form" onSubmit={handleSubmit}>
           <DialogTitle>{modalTitle}</DialogTitle>
-          <DialogContent>
+          <DialogContent sx={{ px: { xs: 2, md: 3 } }}>
             <Stack spacing={2} sx={{ pt: 1 }}>
               <TextField
                 label="Title"
@@ -384,7 +431,7 @@ export default function AdminPostsPage() {
               {editingPost && <ContentBlockBuilder postId={editingPost.id} />}
             </Stack>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ px: { xs: 2, md: 3 }, pb: 2 }}>
             <Button onClick={closeModal}>Cancel</Button>
             <Button type="submit" variant="contained" disabled={saving}>
               {saving ? 'Saving...' : 'Save'}
