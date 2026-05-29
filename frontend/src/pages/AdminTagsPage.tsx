@@ -21,33 +21,27 @@ import {
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ArticleIcon from '@mui/icons-material/Article';
+import CategoryIcon from '@mui/icons-material/Category';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
-import ArticleIcon from '@mui/icons-material/Article';
-import SellIcon from '@mui/icons-material/Sell';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { clearAuthToken, getAuthToken } from '../services/authService';
-import {
-  createCategory,
-  deleteCategory,
-  listCategories,
-  updateCategory,
-} from '../services/categoryService';
-import type { Category, CategoryInput } from '../types/api';
+import { createTag, deleteTag, listTags, updateTag } from '../services/tagService';
+import type { Tag, TagInput } from '../types/api';
 
-const emptyForm: CategoryInput = {
+const emptyForm: TagInput = {
   name: '',
   slug: '',
   description: '',
-  display_order: 0,
 };
 
-export default function AdminCategoriesPage() {
+export default function AdminTagsPage() {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [form, setForm] = useState<CategoryInput>(emptyForm);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [form, setForm] = useState<TagInput>(emptyForm);
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -55,8 +49,8 @@ export default function AdminCategoriesPage() {
   const [error, setError] = useState('');
 
   const modalTitle = useMemo(
-    () => (editingCategory ? 'Edit Category' : 'Create Category'),
-    [editingCategory],
+    () => (editingTag ? 'Edit Tag' : 'Create Tag'),
+    [editingTag],
   );
 
   useEffect(() => {
@@ -65,38 +59,37 @@ export default function AdminCategoriesPage() {
       return;
     }
 
-    void refreshCategories();
+    void refreshTags();
   }, [navigate]);
 
-  async function refreshCategories() {
+  async function refreshTags() {
     setLoading(true);
     setError('');
 
     try {
-      const response = await listCategories();
-      setCategories(response.data);
+      const response = await listTags();
+      setTags(response.data);
     } catch {
-      setError('Unable to load categories. Please sign in again.');
+      setError('Unable to load tags.');
     } finally {
       setLoading(false);
     }
   }
 
   function openCreateModal() {
-    setEditingCategory(null);
+    setEditingTag(null);
     setForm(emptyForm);
     setMessage('');
     setError('');
     setModalOpen(true);
   }
 
-  function openEditModal(category: Category) {
-    setEditingCategory(category);
+  function openEditModal(tag: Tag) {
+    setEditingTag(tag);
     setForm({
-      name: category.name,
-      slug: category.slug,
-      description: category.description,
-      display_order: category.display_order,
+      name: tag.name,
+      slug: tag.slug,
+      description: tag.description,
     });
     setMessage('');
     setError('');
@@ -105,7 +98,7 @@ export default function AdminCategoriesPage() {
 
   function closeModal() {
     setModalOpen(false);
-    setEditingCategory(null);
+    setEditingTag(null);
     setForm(emptyForm);
   }
 
@@ -116,36 +109,36 @@ export default function AdminCategoriesPage() {
     setMessage('');
 
     try {
-      if (editingCategory) {
-        await updateCategory(editingCategory.id, form);
-        setMessage('Category updated.');
+      if (editingTag) {
+        await updateTag(editingTag.id, form);
+        setMessage('Tag updated.');
       } else {
-        await createCategory(form);
-        setMessage('Category created.');
+        await createTag(form);
+        setMessage('Tag created.');
       }
 
       closeModal();
-      await refreshCategories();
+      await refreshTags();
     } catch {
-      setError('Unable to save category. Name is required and slug must be unique.');
+      setError('Unable to save tag. Name and slug are required, and slug must be unique.');
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleDelete(category: Category) {
-    const confirmed = window.confirm(`Delete ${category.name}?`);
+  async function handleDelete(tag: Tag) {
+    const confirmed = window.confirm(`Delete ${tag.name}?`);
     if (!confirmed) return;
 
     setError('');
     setMessage('');
 
     try {
-      await deleteCategory(category.id);
-      setMessage('Category deleted.');
-      await refreshCategories();
+      await deleteTag(tag.id);
+      setMessage('Tag deleted.');
+      await refreshTags();
     } catch {
-      setError('Unable to delete category.');
+      setError('Unable to delete tag.');
     }
   }
 
@@ -173,22 +166,19 @@ export default function AdminCategoriesPage() {
           >
             <Box>
               <Typography variant="h1" sx={{ fontSize: { xs: 34, md: 44 } }}>
-                Categories
+                Tags
               </Typography>
               <Typography sx={{ color: 'text.secondary', mt: 1 }}>
-                Organize guides into friendly island notebook sections.
+                Label posts with helpful community topics.
               </Typography>
             </Box>
 
             <Stack direction="row" spacing={1}>
-              <Button component={RouterLink} to="/" variant="outlined">
-                Home
+              <Button component={RouterLink} to="/admin/categories" variant="outlined" startIcon={<CategoryIcon />}>
+                Categories
               </Button>
               <Button component={RouterLink} to="/admin/posts" variant="outlined" startIcon={<ArticleIcon />}>
                 Posts
-              </Button>
-              <Button component={RouterLink} to="/admin/tags" variant="outlined" startIcon={<SellIcon />}>
-                Tags
               </Button>
               <Button variant="outlined" startIcon={<LogoutIcon />} onClick={handleLogout}>
                 Logout
@@ -216,32 +206,30 @@ export default function AdminCategoriesPage() {
                   <TableCell>Name</TableCell>
                   <TableCell>Slug</TableCell>
                   <TableCell>Description</TableCell>
-                  <TableCell align="right">Order</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading && (
                   <TableRow>
-                    <TableCell colSpan={5}>Loading categories...</TableCell>
+                    <TableCell colSpan={4}>Loading tags...</TableCell>
                   </TableRow>
                 )}
-                {!loading && categories.length === 0 && (
+                {!loading && tags.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5}>No categories yet.</TableCell>
+                    <TableCell colSpan={4}>No tags yet.</TableCell>
                   </TableRow>
                 )}
-                {categories.map((category) => (
-                  <TableRow key={category.id} hover>
-                    <TableCell>{category.name}</TableCell>
-                    <TableCell>{category.slug}</TableCell>
-                    <TableCell>{category.description || '-'}</TableCell>
-                    <TableCell align="right">{category.display_order}</TableCell>
+                {tags.map((tag) => (
+                  <TableRow key={tag.id} hover>
+                    <TableCell>{tag.name}</TableCell>
+                    <TableCell>{tag.slug}</TableCell>
+                    <TableCell>{tag.description || '-'}</TableCell>
                     <TableCell align="right">
-                      <IconButton aria-label={`Edit ${category.name}`} onClick={() => openEditModal(category)}>
+                      <IconButton aria-label={`Edit ${tag.name}`} onClick={() => openEditModal(tag)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton aria-label={`Delete ${category.name}`} onClick={() => void handleDelete(category)}>
+                      <IconButton aria-label={`Delete ${tag.name}`} onClick={() => void handleDelete(tag)}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
@@ -278,18 +266,6 @@ export default function AdminCategoriesPage() {
                 onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                 multiline
                 minRows={3}
-                fullWidth
-              />
-              <TextField
-                label="Display order"
-                type="number"
-                value={form.display_order}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    display_order: Number(event.target.value),
-                  }))
-                }
                 fullWidth
               />
             </Stack>

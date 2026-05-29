@@ -36,7 +36,7 @@ export default function LoginPage() {
       setUser(response.data.user);
       setLoginState('success');
       setMessage('Login successful. Admin token saved for this browser.');
-      navigate('/admin/categories');
+      navigate('/admin/posts');
     } catch {
       setLoginState('error');
       setMessage('Login failed. Please check the admin email and password.');

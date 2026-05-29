@@ -133,7 +133,7 @@ export default function App() {
                 <Button variant="contained" startIcon={<SearchIcon />}>
                   Browse guides
                 </Button>
-                <Button component={RouterLink} to="/admin/categories" variant="outlined" startIcon={<FavoriteIcon />}>
+                <Button component={RouterLink} to="/admin/posts" variant="outlined" startIcon={<FavoriteIcon />}>
                   Admin login
                 </Button>
               </Stack>

@@ -14,10 +14,16 @@ func Register(
 	healthHandler *handler.HealthHandler,
 	authHandler *handler.AuthHandler,
 	categoryHandler *handler.CategoryHandler,
+	tagHandler *handler.TagHandler,
+	postHandler *handler.PostHandler,
 ) {
 	api := e.Group("/api/v1")
 	api.GET("/health", healthHandler.Check)
 	api.POST("/auth/login", authHandler.Login)
+	api.GET("/tags", tagHandler.List)
+	api.GET("/tags/:id", tagHandler.Get)
+	api.GET("/posts", postHandler.List)
+	api.GET("/posts/:id", postHandler.Get)
 
 	protected := api.Group("", appmiddleware.JWTAuth(cfg))
 	protected.GET("/categories", categoryHandler.List)
@@ -25,4 +31,10 @@ func Register(
 	protected.POST("/categories", categoryHandler.Create)
 	protected.PUT("/categories/:id", categoryHandler.Update)
 	protected.DELETE("/categories/:id", categoryHandler.Delete)
+	protected.POST("/tags", tagHandler.Create)
+	protected.PUT("/tags/:id", tagHandler.Update)
+	protected.DELETE("/tags/:id", tagHandler.Delete)
+	protected.POST("/posts", postHandler.Create)
+	protected.PUT("/posts/:id", postHandler.Update)
+	protected.DELETE("/posts/:id", postHandler.Delete)
 }

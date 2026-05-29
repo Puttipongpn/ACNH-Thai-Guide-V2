@@ -32,6 +32,10 @@ func main() {
 	}
 	categoryRepository := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepository)
+	tagRepository := repository.NewTagRepository(db)
+	tagService := service.NewTagService(tagRepository)
+	postRepository := repository.NewPostRepository(db)
+	postService := service.NewPostService(postRepository, categoryRepository, tagRepository)
 
 	e := echo.New()
 	e.HideBanner = true
@@ -46,7 +50,9 @@ func main() {
 	healthHandler := handler.NewHealthHandler(db)
 	authHandler := handler.NewAuthHandler(authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
-	route.Register(e, cfg, healthHandler, authHandler, categoryHandler)
+	tagHandler := handler.NewTagHandler(tagService)
+	postHandler := handler.NewPostHandler(postService)
+	route.Register(e, cfg, healthHandler, authHandler, categoryHandler, tagHandler, postHandler)
 
 	e.Logger.Fatal(e.Start(":" + cfg.ServerPort))
 }
