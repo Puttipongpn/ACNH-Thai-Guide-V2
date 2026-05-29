@@ -36,6 +36,8 @@ func main() {
 	tagService := service.NewTagService(tagRepository)
 	postRepository := repository.NewPostRepository(db)
 	postService := service.NewPostService(postRepository, categoryRepository, tagRepository)
+	contentBlockRepository := repository.NewContentBlockRepository(db)
+	contentBlockService := service.NewContentBlockService(contentBlockRepository, postRepository)
 
 	e := echo.New()
 	e.HideBanner = true
@@ -52,7 +54,8 @@ func main() {
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	tagHandler := handler.NewTagHandler(tagService)
 	postHandler := handler.NewPostHandler(postService)
-	route.Register(e, cfg, healthHandler, authHandler, categoryHandler, tagHandler, postHandler)
+	contentBlockHandler := handler.NewContentBlockHandler(contentBlockService)
+	route.Register(e, cfg, healthHandler, authHandler, categoryHandler, tagHandler, postHandler, contentBlockHandler)
 
 	e.Logger.Fatal(e.Start(":" + cfg.ServerPort))
 }

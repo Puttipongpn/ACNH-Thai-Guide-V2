@@ -1,7 +1,7 @@
 # Current Status
 
 Project Stage:
-Foundation + Authentication + Category + Tag + Post Management
+Foundation + Authentication + Category + Tag + Post + Content Builder Management
 
 Completed:
 - Docker Compose foundation
@@ -80,11 +80,39 @@ Completed:
 - Post validation checks: title required, slug required, category required, status draft/published, slug unique
 - Post authorization checks: unauthenticated create/update/delete return 401
 - Deleted post lookup returns 404
+- Complete post CRUD re-verification passed: unauthorized create/update/delete 401, create with category 201, create with tags 201, duplicate slug 409, invalid status 400, update 200, get updated 200, delete 200, deleted lookup 404
+- ContentBlock model with UUID primary key
+- Automatic content_blocks table migration
+- ContentBlock belongs to Post with cascade delete
+- JSON metadata support for content block settings
+- Content block repository, service, handler, and routes
+- Public content block read API at GET /api/v1/posts/:post_id/content-blocks
+- Protected content block create API at POST /api/v1/posts/:post_id/content-blocks
+- Protected content block update API at PUT /api/v1/content-blocks/:id
+- Protected content block delete API at DELETE /api/v1/content-blocks/:id
+- Protected content block reorder API at PUT /api/v1/posts/:post_id/content-blocks/reorder
+- Content block validation for TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, and HIGHLIGHT_BLOCK
+- Content block validation checks: post exists, supported type, non-negative sort order, required metadata/content fields
+- Admin content builder inside the Admin Posts edit modal
+- Admin content builder supports add, edit, delete, reorder, save, and preview
+- Admin content builder supports text, image, video, and highlight blocks
+- Public Post Detail page at /posts/:id
+- Public post detail content block rendering
+- TEXT_BLOCK renders small, medium, and large text sizes
+- IMAGE_BLOCK renders full_width, left_image, and right_image layouts
+- VIDEO_BLOCK renders YouTube embeds when possible and external links otherwise
+- HIGHLIGHT_BLOCK renders as a soft highlighted box
+- Docker Compose rebuild verification after content builder changes
+- Content block CRUD API verification: create, list, update, reorder, delete
+- Content block authorization checks: unauthenticated create/update/delete/reorder return 401
+- Content block validation checks: unsupported block type returns 400 and missing text content returns 400
+- Public post detail route verification returned HTTP 200
+- Complete content builder re-verification passed: create TEXT_BLOCK, IMAGE_BLOCK, VIDEO_BLOCK, HIGHLIGHT_BLOCK; update each block type; delete a block; reorder blocks; get blocks by post; unauthorized create/update/delete/reorder 401; public post detail route 200
 
 Next Task:
-- Add content block model and content builder
 - Add media file model and management
-- Add public post listing/detail UI
+- Add public post listing UI
+- Improve public guide discovery and filtering
 
 Notes:
 - Docker Compose stack is currently running in detached mode.
@@ -99,7 +127,12 @@ Notes:
 - Latest focused tag CRUD verification found no issues.
 - Verified post read endpoints are public and post write endpoints require admin JWT authentication.
 - Latest post verification found no CRUD, validation, relation, TypeScript, Go compilation, or authorization issues.
+- Latest focused post CRUD verification found no issues.
+- Verified content block read endpoint is public and content block write/reorder endpoints require admin JWT authentication.
+- Latest content builder verification found no CRUD, validation, relation, TypeScript, Go compilation, Docker, or authorization issues.
+- Latest focused content builder verification kept all four render block types after delete test and found no CRUD, reorder, read, route, or authorization issues.
 - Browser automation was unavailable in this session, but frontend route /admin/categories returned HTTP 200 and frontend production build passed.
+- Browser automation was unavailable in this session, but frontend route /posts/:id returned HTTP 200 and frontend production build passed.
 
 Definition of Done:
 docker compose up works

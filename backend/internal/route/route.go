@@ -16,6 +16,7 @@ func Register(
 	categoryHandler *handler.CategoryHandler,
 	tagHandler *handler.TagHandler,
 	postHandler *handler.PostHandler,
+	contentBlockHandler *handler.ContentBlockHandler,
 ) {
 	api := e.Group("/api/v1")
 	api.GET("/health", healthHandler.Check)
@@ -24,6 +25,7 @@ func Register(
 	api.GET("/tags/:id", tagHandler.Get)
 	api.GET("/posts", postHandler.List)
 	api.GET("/posts/:id", postHandler.Get)
+	api.GET("/posts/:post_id/content-blocks", contentBlockHandler.List)
 
 	protected := api.Group("", appmiddleware.JWTAuth(cfg))
 	protected.GET("/categories", categoryHandler.List)
@@ -37,4 +39,8 @@ func Register(
 	protected.POST("/posts", postHandler.Create)
 	protected.PUT("/posts/:id", postHandler.Update)
 	protected.DELETE("/posts/:id", postHandler.Delete)
+	protected.POST("/posts/:post_id/content-blocks", contentBlockHandler.Create)
+	protected.PUT("/content-blocks/:id", contentBlockHandler.Update)
+	protected.DELETE("/content-blocks/:id", contentBlockHandler.Delete)
+	protected.PUT("/posts/:post_id/content-blocks/reorder", contentBlockHandler.Reorder)
 }

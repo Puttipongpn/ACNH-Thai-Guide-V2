@@ -126,8 +126,8 @@ export default function App() {
                 Starter Home
               </Typography>
               <Typography sx={{ color: 'text.secondary', maxWidth: 760 }}>
-                The foundation is ready for public browsing, search, admin tools, and a content builder.
-                Next up: categories, tags, posts, and the first guide pages.
+                The foundation is ready with admin tools, post management, and a cozy content builder.
+                Next up: public browsing, search, media files, and the first guide pages.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <Button variant="contained" startIcon={<SearchIcon />}>

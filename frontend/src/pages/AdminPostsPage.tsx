@@ -35,6 +35,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SellIcon from '@mui/icons-material/Sell';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import ContentBlockBuilder from '../components/ContentBlockBuilder';
 import { clearAuthToken, getAuthToken } from '../services/authService';
 import { listCategories } from '../services/categoryService';
 import { createPost, deletePost, listPosts, updatePost } from '../services/postService';
@@ -286,7 +287,7 @@ export default function AdminPostsPage() {
         </Stack>
       </Container>
 
-      <Dialog open={modalOpen} onClose={closeModal} fullWidth maxWidth="md">
+      <Dialog open={modalOpen} onClose={closeModal} fullWidth maxWidth="lg">
         <Box component="form" onSubmit={handleSubmit}>
           <DialogTitle>{modalTitle}</DialogTitle>
           <DialogContent>
@@ -379,6 +380,8 @@ export default function AdminPostsPage() {
                   ))}
                 </Select>
               </FormControl>
+
+              {editingPost && <ContentBlockBuilder postId={editingPost.id} />}
             </Stack>
           </DialogContent>
           <DialogActions>

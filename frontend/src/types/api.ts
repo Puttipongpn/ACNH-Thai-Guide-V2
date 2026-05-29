@@ -80,3 +80,38 @@ export type PostInput = {
   category_id: string;
   tag_ids: string[];
 };
+
+export type ContentBlockType = 'TEXT_BLOCK' | 'IMAGE_BLOCK' | 'VIDEO_BLOCK' | 'HIGHLIGHT_BLOCK';
+
+export type ContentTextSize = 'small' | 'medium' | 'large';
+
+export type ContentImageLayout = 'full_width' | 'left_image' | 'right_image';
+
+export type ContentBlockMetadata = {
+  size?: ContentTextSize;
+  image_url?: string;
+  alt_text?: string;
+  layout?: ContentImageLayout;
+  caption?: string;
+  text?: string;
+  title?: string;
+  url?: string;
+};
+
+export type ContentBlock = {
+  id: string;
+  post_id: string;
+  type: ContentBlockType;
+  sort_order: number;
+  content: string;
+  metadata: ContentBlockMetadata;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ContentBlockInput = {
+  type: ContentBlockType;
+  sort_order: number;
+  content: string;
+  metadata: ContentBlockMetadata;
+};
